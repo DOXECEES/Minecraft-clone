@@ -1,6 +1,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm.hpp>
 
 #include <iostream>
 
@@ -12,11 +13,17 @@ void error_callback(int error, const char* description)
 				 "[DESCRIPTION] " << description << std::endl;
 } 
 
+const float verticies[] = 
+	{-0.5f, -0.5f, 0.0f,
+     0.5f, -0.5f, 0.0f,
+     0.0f,  0.5f, 0.0f};
+
+
 
 int main()
 {
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
 
 	glfwSetErrorCallback(error_callback);
@@ -31,7 +38,7 @@ int main()
 	
 	while (wnd->Render())
 	{
-				
+		
 
 	}
 

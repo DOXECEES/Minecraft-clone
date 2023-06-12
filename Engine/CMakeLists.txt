@@ -28,6 +28,7 @@ target_include_directories(Engine
     PUBLIC OpenGL:GL
     PUBLIC dependencies/glfw/include
     PUBLIC dependencies/glad/include
+    PUBLIC dependencies/glm
     )
 
 

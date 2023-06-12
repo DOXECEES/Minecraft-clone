@@ -2,15 +2,20 @@
 #include <glfw/glfw3.h>
 #include <glad/glad.h>
 
-
-class VertexBuffer 
+namespace Render
 {
-public:
+    class VertexBuffer 
+    {
+    public:
 
-    VertexBuffer();
-    ~VertexBuffer();
+        VertexBuffer();
+        ~VertexBuffer();
 
-private:
-    GLuint VBO;
+    private:
+        GLuint VBO;
+        GLsizei ID;
+    private:
+        //static GLsizei freeId; // Free id in current moment 
+    };
 
 }
