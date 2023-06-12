@@ -1,9 +1,15 @@
 
 #include "Window.hpp"
 
-Render::Window::Window()
+Renderer::Window::Window()
     :width(640),height(480),title("Engine")
 {
+    if (!glfwInit()) 
+	{
+		std::cout << "GLFW initialization failed!" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+
     window = glfwCreateWindow(width,height,title,nullptr,nullptr);
 
     if(!window)
@@ -14,12 +20,23 @@ Render::Window::Window()
 
     glfwMakeContextCurrent(window);
 
+     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "GLAD initialization failed " << std::endl;
+		exit(EXIT_FAILURE);
+    }
 }
 
 
-Render::Window::Window(uint32_t width,uint32_t height,const char* title)
+Renderer::Window::Window(uint32_t width,uint32_t height,const char* title)
     :width(width),height(height),title(title)
 {
+    if (!glfwInit()) 
+	{
+		std::cout << "GLFW initialization failed!" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+
      window = glfwCreateWindow(width,height,title,nullptr,nullptr);
 
     if(!window)
@@ -30,11 +47,19 @@ Render::Window::Window(uint32_t width,uint32_t height,const char* title)
 
     glfwMakeContextCurrent(window);
 
+    if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "GLAD initialization failed " << std::endl;
+		exit(EXIT_FAILURE);
+    }
+
 }
 
 
-bool Render::Window::Render()
+bool Renderer::Window::Render()
 {   
+    glfwMakeContextCurrent(window);
+
     if(!glfwWindowShouldClose(window))
     {
         glfwSwapBuffers(window);
@@ -47,3 +72,4 @@ bool Render::Window::Render()
     }
    
 }
+

@@ -1,9 +1,10 @@
+#pragma once
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-namespace Render
+namespace Renderer
 {
     class Window
     {
@@ -12,7 +13,6 @@ namespace Render
         Window();
         Window(uint32_t width,uint32_t height,const char* title);
         Window(const Window& other) = delete;
-
         ~Window() = default;
 
         bool Render();

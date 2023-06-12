@@ -1,3 +1,6 @@
 [submodule "Engine/dependencies/glfw"]
 	path = Engine/dependencies/glfw
 	url = https://github.com/glfw/glfw.git
+[submodule "Engine/dependencies/glew"]
+	path = Engine/dependencies/glew
+	url = https://github.com/Perlmint/glew-cmake.git
