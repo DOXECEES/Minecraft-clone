@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25.0)
 
 project(Engine)
-
+set (CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(dependencies/glfw)
 add_subdirectory(dependencies/glad)
@@ -13,12 +13,14 @@ set(ENGINE_SORCE_FILES  src/main.cpp
                         src/Render/VertexBuffer.cpp
                         src/Render/VertexArray.cpp
                         src/Render/Shader.cpp
+                        src/Logger.cpp
                         )
 
 set(ENGINE_HEADER_FILES src/Render/Window.hpp
                         src/Render/VertexBuffer.hpp
                         src/Render/VertexArray.hpp
                         src/Render/Shader.hpp
+                        src/Logger.hpp
                         )
 
 set(ENGINE_ALL_SOURCES ${ENGINE_HEADER_FILES}

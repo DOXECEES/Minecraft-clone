@@ -11,6 +11,7 @@
 #include "Render/Window.hpp"
 #include "Render/VertexArray.hpp"
 #include "Render/VertexBuffer.hpp"
+#include "Logger.hpp"
 
 void error_callback(int error, const char* description)
 {
@@ -44,6 +45,9 @@ const GLchar* fragmentShaderSource = R"(
 
 int main()
 {
+
+	Logger::EnableConsoleLogging();
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
