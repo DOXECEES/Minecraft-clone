@@ -4,6 +4,8 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+#include "../Logger.hpp"
+
 namespace Renderer
 {
     class Window

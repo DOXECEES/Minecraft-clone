@@ -6,7 +6,7 @@ Renderer::Window::Window()
 {
     if (!glfwInit()) 
 	{
-		std::cout << "GLFW initialization failed!" << std::endl;
+        Logger::Log("GLFW initialization failed!",Logger::FATAL);
 		exit(EXIT_FAILURE);
 	}
 
@@ -14,7 +14,7 @@ Renderer::Window::Window()
 
     if(!window)
 	{
-		std::cout << "Failed to create window" << std::endl;
+        Logger::Log("Failed to create window",Logger::FATAL);
 		exit(EXIT_FAILURE);
 	}
 
@@ -22,7 +22,7 @@ Renderer::Window::Window()
 
      if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        std::cout << "GLAD initialization failed " << std::endl;
+        Logger::Log("GLAD initialization failed ",Logger::FATAL);
 		exit(EXIT_FAILURE);
     }
 }
@@ -33,7 +33,7 @@ Renderer::Window::Window(uint32_t width,uint32_t height,const char* title)
 {
     if (!glfwInit()) 
 	{
-		std::cout << "GLFW initialization failed!" << std::endl;
+        Logger::Log("GLFW initialization failed!",Logger::FATAL);
 		exit(EXIT_FAILURE);
 	}
 
@@ -41,7 +41,7 @@ Renderer::Window::Window(uint32_t width,uint32_t height,const char* title)
 
     if(!window)
 	{
-		std::cout << "Failed to create window" << std::endl;
+        Logger::Log("Failed to create window",Logger::FATAL);
 		exit(EXIT_FAILURE);
 	}
 
@@ -49,7 +49,7 @@ Renderer::Window::Window(uint32_t width,uint32_t height,const char* title)
 
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        std::cout << "GLAD initialization failed " << std::endl;
+        Logger::Log("GLAD initialization failed ",Logger::FATAL);
 		exit(EXIT_FAILURE);
     }
 
