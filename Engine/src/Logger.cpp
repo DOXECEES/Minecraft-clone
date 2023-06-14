@@ -1,6 +1,7 @@
 
 #include "Logger.hpp"
 
+
 void Logger::Log(const std::string &logMessage,LoggingLevel level)
 {
     if(isDebugConsoleEnable)

@@ -51,4 +51,4 @@ target_link_directories(Engine
 
 target_link_libraries(Engine glfw glad)
 
-
+file(GLOB RES_FILES src/Shaders/ver.vs)

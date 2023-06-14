@@ -11,6 +11,7 @@
 #include "Render/Window.hpp"
 #include "Render/VertexArray.hpp"
 #include "Render/VertexBuffer.hpp"
+#include "Render/Shader.hpp"
 #include "Logger.hpp"
 
 void error_callback(int error, const char* description)
@@ -50,8 +51,11 @@ int main()
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 
+	Logger::Log("Starting..." ,Logger::INFO);
+
+	
 
 	//glfwSetErrorCallback(error_callback);
 
@@ -59,7 +63,14 @@ int main()
 
 	Renderer::Window *wnd = new Renderer::Window(1920,1080,"ass");
 
+	Renderer::Shader s = Renderer::Shader();
+	s.LoadShader("Shaders\\ver.vs");
+	s.LoadShader("Shaders\\frag.fs");
+
+	s.CreateProgram();
+
 	//
+	/*
 	GLuint vertexShader;
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
@@ -79,6 +90,8 @@ int main()
 	glAttachShader(shaderProgram, fragmentShader);
 	glLinkProgram(shaderProgram);
 
+*/
+
 	Renderer::VertexArray aa;
 	aa.Link(verticies);
 
@@ -91,7 +104,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Draw our first triangle
-		glUseProgram(shaderProgram);
+		glUseProgram(s.GetProgram());
         aa.Draw(3);
         // Swap the screen buffers
         

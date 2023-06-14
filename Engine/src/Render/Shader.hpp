@@ -1,5 +1,6 @@
-#define GLFW_INCLUDE_NONE
 #pragma once
+
+#define GLFW_INCLUDE_NONE
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -8,6 +9,9 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <memory>
+
+#include "../Logger.hpp"
 
 namespace Renderer
 {
@@ -16,13 +20,19 @@ namespace Renderer
         public:
 
             Shader();
-            ~Shader();
+            ~Shader() = default;
 
-            bool LoadShader(std::string path);
-            
+            bool LoadShader(const std::string& path);
+            void  CreateProgram();
+            GLuint GetProgram() { return shaderProgram; };
+
+        private:
+            void CompileShader(GLuint &shader);
+
         private:
             GLuint shaderProgram;
-
+            GLuint vertexShader;
+            GLuint fragmentShader;
     };
 
 
