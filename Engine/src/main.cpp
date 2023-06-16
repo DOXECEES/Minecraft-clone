@@ -26,28 +26,14 @@ std::vector<GLfloat> verticies =
      0.0f,  0.5f, 0.0f};
 
 
-const GLchar* vertexShaderSource = "#version 330 core\n"
-      "layout (location = 0) in vec3 aPos;\n"
-      "void main()\n"
-      "{\n"
-      "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-	"}\0";
-
-const GLchar* fragmentShaderSource = R"(
-      #version 330 core
-      out vec4 lineColor;
-      void main()
-      {
-          lineColor = vec4(1.0f, 0.1f, 0.2f, 1.0f);
-      }
-)";
-
 
 
 int main()
 {
-
+	
+	
 	Logger::EnableConsoleLogging();
+	Logger::StartLogging();
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
@@ -69,29 +55,6 @@ int main()
 
 	s.CreateProgram();
 
-	//
-	/*
-	GLuint vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-
-	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-
-
-	GLuint shaderProgram;
-	shaderProgram = glCreateProgram();
-
-
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-
-*/
-
 	Renderer::VertexArray aa;
 	aa.Link(verticies);
 
@@ -106,7 +69,6 @@ int main()
         // Draw our first triangle
 		glUseProgram(s.GetProgram());
         aa.Draw(3);
-        // Swap the screen buffers
         
 
 	}

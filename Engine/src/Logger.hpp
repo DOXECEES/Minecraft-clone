@@ -20,6 +20,7 @@ class Logger
 
         static void Log(const std::string &logMessage,LoggingLevel level);
         static void EnableConsoleLogging();
+        static void StartLogging();
     
     private:
         static void LogConsole(const std::string &logMessage,LoggingLevel level);
@@ -29,6 +30,7 @@ class Logger
 
     private:
         static bool isDebugConsoleEnable; 
+        static std::ofstream file;
 
 
 

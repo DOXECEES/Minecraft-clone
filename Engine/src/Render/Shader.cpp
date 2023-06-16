@@ -30,7 +30,6 @@ bool Renderer::Shader::LoadShader(const std::string& path)
         shaderSource.append(buffer);
         shaderSource += '\n';
     }
-    std::cout << shaderSource;
 
     size_t pos = path.find('.');
 

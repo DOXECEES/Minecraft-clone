@@ -44,19 +44,16 @@ void Logger::LogConsole(const std::string &logMessage,LoggingLevel level)
     time.erase(std::remove(time.begin(),time.end(),'\n'),time.end());
 
     std::cout <<"[" << time << "]"
-    << "["<< GetLevelS(level) <<"] " << logMessage;
+    << "["<< GetLevelS(level) <<"] " << logMessage << std::endl;
 }
 
 void Logger::LogFile(const std::string &logMessage,LoggingLevel level)
 {
-    std::ofstream file;
-    file.open("latest.txt");
-
     std::string time = GetTime();
     time.erase(std::remove(time.begin(),time.end(),'\n'),time.end());
 
     file << "[" << time << "]" << 
-        "[" << GetLevelS(level) << "] " << logMessage;
+        "[" << GetLevelS(level) << "] " << logMessage << '\n';
 }
 
 
@@ -66,4 +63,11 @@ void Logger::EnableConsoleLogging()
 }
 
 
+void Logger::StartLogging()
+{
+    file.open("latest.txt");
+}
+
+
 bool Logger::isDebugConsoleEnable = false;
+std::ofstream Logger::file;
