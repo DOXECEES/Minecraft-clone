@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "VertexBuffer.hpp"
+#include "IndexBuffer.hpp"
 
 namespace Renderer
 {
@@ -21,11 +22,13 @@ namespace Renderer
 
             void Bind();
             void Draw(GLsizei count);
-            void Link(const std::vector<GLfloat> &data);
+            void Link(const std::vector<GLfloat> &data, const std::vector<GLuint> &indices);
 
         private:
             GLuint VAO;
+
             std::vector<GLuint> VertexBuffers;
+            std::vector<GLuint> IndexBuffers;
 
 
     };

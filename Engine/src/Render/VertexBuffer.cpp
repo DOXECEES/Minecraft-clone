@@ -17,8 +17,7 @@ void Renderer::VertexBuffer::Bind()
 
 void Renderer::VertexBuffer::SetData(const std::vector<GLfloat> &data)
 {
-    glBufferData(GL_ARRAY_BUFFER,data.size()*sizeof(GLfloat),data.data(), GL_STATIC_DRAW);
-
+    glBufferData(GL_ARRAY_BUFFER,data.size() * sizeof(GLfloat),data.data(), GL_STATIC_DRAW);
 }
 
 
@@ -26,6 +25,8 @@ GLuint Renderer::VertexBuffer::GetVBO()
 {
     return VBO;
 }
+
+
 
 
 

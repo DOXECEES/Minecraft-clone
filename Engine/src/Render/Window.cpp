@@ -1,6 +1,8 @@
 
 #include "Window.hpp"
 
+
+
 Renderer::Window::Window()
     :width(640),height(480),title("Engine")
 {
@@ -16,15 +18,20 @@ Renderer::Window::Window()
 	{
         Logger::Log("Failed to create window",Logger::FATAL);
 		exit(EXIT_FAILURE);
-	}
+	}    
 
     glfwMakeContextCurrent(window);
+
+    kbr = std::make_unique<EventsHandler::Keyboard>(window);
+
 
      if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         Logger::Log("GLAD initialization failed ",Logger::FATAL);
 		exit(EXIT_FAILURE);
     }
+
+    
 }
 
 
@@ -46,6 +53,8 @@ Renderer::Window::Window(uint32_t width,uint32_t height,const char* title)
 	}
 
     glfwMakeContextCurrent(window);
+
+    kbr = std::make_unique<EventsHandler::Keyboard>(window);
 
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {

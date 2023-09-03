@@ -11,6 +11,12 @@ Renderer::Shader::Shader()
 }
 
 
+Renderer::Shader::~Shader()
+{
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+}
+
 bool Renderer::Shader::LoadShader(const std::string& path)
 {
     std::ifstream shader;

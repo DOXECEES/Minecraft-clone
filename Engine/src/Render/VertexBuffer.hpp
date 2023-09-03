@@ -25,7 +25,6 @@ namespace Renderer
         GLuint GetVBO();
 
     private:
-
         GLuint VBO;
 
     private:

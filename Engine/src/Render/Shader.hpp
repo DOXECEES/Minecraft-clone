@@ -20,11 +20,14 @@ namespace Renderer
         public:
 
             Shader();
-            ~Shader() = default;
+            ~Shader();
 
             bool LoadShader(const std::string& path);
             void  CreateProgram();
-            GLuint GetProgram() { return shaderProgram; };
+            //void SetUniform(const std::string& uName,  );
+            void Use() { return glUseProgram(this->shaderProgram); } 
+            GLuint GetProgram() const { return this->shaderProgram; }
+
 
         private:
             void CompileShader(GLuint &shader);

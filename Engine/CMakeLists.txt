@@ -13,14 +13,22 @@ set(ENGINE_SORCE_FILES  src/main.cpp
                         src/Render/VertexBuffer.cpp
                         src/Render/VertexArray.cpp
                         src/Render/Shader.cpp
+                        src/Render/IndexBuffer.cpp
+                        src/Render/Texture.cpp
+                        src/EventsHandler/Keyboard.cpp
                         src/Logger.cpp
+                        src/Camera.cpp
                         )
 
 set(ENGINE_HEADER_FILES src/Render/Window.hpp
                         src/Render/VertexBuffer.hpp
                         src/Render/VertexArray.hpp
                         src/Render/Shader.hpp
+                        src/Render/IndexBuffer.hpp
+                        src/Render/Texture.hpp
+                        src/EventsHandler/Keyboard.hpp
                         src/Logger.hpp
+                        src/Camera.hpp
                         )
 
 set(ENGINE_ALL_SOURCES ${ENGINE_HEADER_FILES}
@@ -51,4 +59,8 @@ target_link_directories(Engine
 
 target_link_libraries(Engine glfw glad)
 
-file(GLOB RES_FILES src/Shaders/ver.vs)
+set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/res $<TARGET_FILE_DIR:${PROJECT_NAME}>/res)                   

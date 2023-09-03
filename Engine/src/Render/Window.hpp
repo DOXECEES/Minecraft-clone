@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "../Logger.hpp"
+#include "../EventsHandler/Keyboard.hpp"
 
 namespace Renderer
 {
@@ -18,9 +19,13 @@ namespace Renderer
         ~Window() = default;
 
         bool Render();
-        
+        GLFWwindow* GetWindow() const {return window;}
 
-
+    public:
+    
+    public:
+        std::unique_ptr<EventsHandler::Keyboard> kbr;
+    
     private:
         GLFWwindow* window;
         uint32_t width;
