@@ -2,3 +2,6 @@
 	path = Engine/dependencies/glfw
 	url = https://github.com/glfw/glfw.git
 
+[submodule "Engine/dependencies/lodepng"]
+	path = Engine/dependencies/lodepng
+	url = https://github.com/lvandeve/lodepng.git
