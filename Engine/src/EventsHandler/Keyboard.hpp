@@ -16,13 +16,12 @@ namespace EventsHandler
     class Keyboard
     {
 
-    static constexpr uint16_t MAX_KEY_CODE = 348;  // 348 is the biggest number in GLFW key codes (GLFW_KEY_MENU)
+        static constexpr uint16_t MAX_KEY_CODE = 348; // 348 is the biggest number in GLFW key codes (GLFW_KEY_MENU)
 
     public:
-
-        Keyboard(GLFWwindow *Window);
-        Keyboard(const Keyboard& other) = default;
-        Keyboard& operator=(const Keyboard&) = default;
+        Keyboard();
+        Keyboard(const Keyboard &other) = default;
+        Keyboard &operator=(const Keyboard &) = default;
 
         ~Keyboard() = default;
 
@@ -31,11 +30,8 @@ namespace EventsHandler
 
         void Set(uint16_t keyCode, bool state);
 
-
     private:
-
-        std::bitset<MAX_KEY_CODE> keys; 
+        std::bitset<MAX_KEY_CODE> keys;
     };
-
 
 };

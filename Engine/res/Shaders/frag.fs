@@ -1,11 +1,8 @@
 #version 330 core
-out vec4 lineColor;
 in vec2 TexCoord;
 
-uniform vec4 time;
+out vec4 lineColor;
+
 uniform sampler2D ourTexture;
 
-void main()
-{
-    lineColor = texture(ourTexture, TexCoord);
-}
+void main() { lineColor = texture(ourTexture, TexCoord); }

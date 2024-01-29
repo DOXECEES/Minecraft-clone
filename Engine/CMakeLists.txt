@@ -5,7 +5,6 @@ set (CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(dependencies/glfw)
 add_subdirectory(dependencies/glad)
-add_subdirectory(dependencies/glew)
 
 
 set(ENGINE_SORCE_FILES  src/main.cpp
@@ -15,9 +14,14 @@ set(ENGINE_SORCE_FILES  src/main.cpp
                         src/Render/Shader.cpp
                         src/Render/IndexBuffer.cpp
                         src/Render/Texture.cpp
+                        src/Render/Mesh.cpp
                         src/EventsHandler/Keyboard.cpp
+                        src/EventsHandler/Mouse.cpp
+                        src/EventsHandler/Input.cpp
                         src/Logger.cpp
                         src/Camera.cpp
+                        dependencies/lodepng/lodepng.cpp
+
                         )
 
 set(ENGINE_HEADER_FILES src/Render/Window.hpp
@@ -26,9 +30,15 @@ set(ENGINE_HEADER_FILES src/Render/Window.hpp
                         src/Render/Shader.hpp
                         src/Render/IndexBuffer.hpp
                         src/Render/Texture.hpp
+                        src/Render/Mesh.hpp
                         src/EventsHandler/Keyboard.hpp
+                        src/EventsHandler/Mouse.hpp
+                        src/EventsHandler/Input.hpp
                         src/Logger.hpp
                         src/Camera.hpp
+                        src/Templates/Array3D.hpp
+                        dependencies/lodepng/lodepng.h
+                        
                         )
 
 set(ENGINE_ALL_SOURCES ${ENGINE_HEADER_FILES}

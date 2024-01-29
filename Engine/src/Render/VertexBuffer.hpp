@@ -9,18 +9,18 @@
 namespace Renderer
 {
 
-    class VertexBuffer 
+    class VertexBuffer
     {
     public:
         VertexBuffer();
-        VertexBuffer(const VertexBuffer& other) = default;
-        VertexBuffer& operator=(const VertexBuffer&) = default;
+        VertexBuffer(const VertexBuffer &other) = default;
+        VertexBuffer &operator=(const VertexBuffer &) = default;
 
         ~VertexBuffer() = default;
 
         void Bind();
+        void UnBind();
         void SetData(const std::vector<GLfloat> &data);
-
 
         GLuint GetVBO();
 

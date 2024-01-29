@@ -6,6 +6,8 @@
 
 #include "../Logger.hpp"
 #include "../EventsHandler/Keyboard.hpp"
+#include "../EventsHandler/Mouse.hpp"
+#include "../EventsHandler/Input.hpp"
 
 namespace Renderer
 {
@@ -14,24 +16,22 @@ namespace Renderer
 
     public:
         Window();
-        Window(uint32_t width,uint32_t height,const char* title);
-        Window(const Window& other) = delete;
+        Window(uint32_t width, uint32_t height, const char *title);
+        Window(const Window &other) = delete;
         ~Window() = default;
 
         bool Render();
-        GLFWwindow* GetWindow() const {return window;}
+        GLFWwindow *GetWindow() const { return window; }
 
     public:
-    
-    public:
-        std::unique_ptr<EventsHandler::Keyboard> kbr;
-    
+        // std::unique_ptr<EventsHandler::Keyboard> kbr;
+        //  std::unique_ptr<EventsHandler::Mouse> mouse;
+        std::unique_ptr<EventsHandler::Input> input;
+
     private:
-        GLFWwindow* window;
+        GLFWwindow *window;
         uint32_t width;
         uint32_t height;
-        const char* title;
-
-
+        const char *title;
     };
 }

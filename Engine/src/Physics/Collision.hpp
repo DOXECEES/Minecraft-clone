@@ -1,0 +1,7 @@
+
+
+class Collision
+{
+public:
+private:
+}
