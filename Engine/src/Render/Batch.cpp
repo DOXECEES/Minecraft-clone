@@ -9,10 +9,16 @@ void Renderer::Batch::Vertex(const float x, const float y, const float z, const 
     vertices.insert(vertices.end(), {x, y, z, u, v});
 }
 
-void Renderer::Batch::MakeIndiciesForQuad()
+void Renderer::Batch::MakeIndiciesForQuad_CW()
 {
     currentIndex += 4;
     indicies.insert(indicies.end(), {currentIndex - 4, currentIndex - 3, currentIndex - 2, currentIndex - 2, currentIndex - 1, currentIndex - 4});
+}
+
+void Renderer::Batch::MakeIndiciesForQuad_CCW()
+{
+    currentIndex += 4;
+    indicies.insert(indicies.end(), {currentIndex - 2, currentIndex - 3, currentIndex - 4, currentIndex - 2, currentIndex - 4, currentIndex - 1});
 }
 
 void Renderer::Batch::Face(const glm::vec3 coords, float u, float v, Faces face)
@@ -25,6 +31,7 @@ void Renderer::Batch::Face(const glm::vec3 coords, float u, float v, Faces face)
         Vertex(coords.x - 0.5f, coords.y + 0.5f, coords.z - 0.5f, u, v);
         Vertex(coords.x + 0.5f, coords.y + 0.5f, coords.z - 0.5f, u, v);
         Vertex(coords.x + 0.5f, coords.y - 0.5f, coords.z - 0.5f, u, v);
+        MakeIndiciesForQuad_CW();
         break;
     }
     case Faces::BACK:
@@ -33,6 +40,7 @@ void Renderer::Batch::Face(const glm::vec3 coords, float u, float v, Faces face)
         Vertex(coords.x - 0.5f, coords.y + 0.5f, coords.z + 0.5f, u, v);
         Vertex(coords.x + 0.5f, coords.y + 0.5f, coords.z + 0.5f, u, v);
         Vertex(coords.x + 0.5f, coords.y - 0.5f, coords.z + 0.5f, u, v);
+        MakeIndiciesForQuad_CCW();
         break;
     }
     case Faces::LEFT:
@@ -41,6 +49,7 @@ void Renderer::Batch::Face(const glm::vec3 coords, float u, float v, Faces face)
         Vertex(coords.x - 0.5f, coords.y + 0.5f, coords.z - 0.5f, u, v);
         Vertex(coords.x - 0.5f, coords.y + 0.5f, coords.z + 0.5f, u, v);
         Vertex(coords.x - 0.5f, coords.y - 0.5f, coords.z + 0.5f, u, v);
+        MakeIndiciesForQuad_CCW();
         break;
     }
     case Faces::RIGHT:
@@ -49,6 +58,7 @@ void Renderer::Batch::Face(const glm::vec3 coords, float u, float v, Faces face)
         Vertex(coords.x + 0.5f, coords.y + 0.5f, coords.z - 0.5f, u, v);
         Vertex(coords.x + 0.5f, coords.y + 0.5f, coords.z + 0.5f, u, v);
         Vertex(coords.x + 0.5f, coords.y - 0.5f, coords.z + 0.5f, u, v);
+        MakeIndiciesForQuad_CW();
         break;
     }
     case Faces::TOP:
@@ -57,6 +67,7 @@ void Renderer::Batch::Face(const glm::vec3 coords, float u, float v, Faces face)
         Vertex(coords.x - 0.5f, coords.y + 0.5f, coords.z + 0.5f, u, v);
         Vertex(coords.x + 0.5f, coords.y + 0.5f, coords.z + 0.5f, u, v);
         Vertex(coords.x + 0.5f, coords.y + 0.5f, coords.z - 0.5f, u, v);
+        MakeIndiciesForQuad_CW();
         break;
     }
     case Faces::BOT:
@@ -65,13 +76,12 @@ void Renderer::Batch::Face(const glm::vec3 coords, float u, float v, Faces face)
         Vertex(coords.x - 0.5f, coords.y - 0.5f, coords.z + 0.5f, u, v);
         Vertex(coords.x + 0.5f, coords.y - 0.5f, coords.z + 0.5f, u, v);
         Vertex(coords.x + 0.5f, coords.y - 0.5f, coords.z - 0.5f, u, v);
+        MakeIndiciesForQuad_CCW();
         break;
     }
     default:
-        break;
+        return;
     }
-
-    MakeIndiciesForQuad();
 }
 
 Renderer::Mesh *Renderer::Batch::GetMesh()

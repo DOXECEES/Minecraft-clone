@@ -176,9 +176,9 @@ glm::vec3 cameraPos(0.0f, 0.0f, 0.0f);
 glm::vec3 camFront(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
-bool isIn(size_t x, size_t y, size_t z)
+bool isIn(int x, int y, int z)
 {
-    return ((x >= 0 && x <= 15) && (y >= 0 && y <= 15) && (z >= 0 && z <= 15)) ? true : false;
+    return ((x >= 0 && x < 16) && (y >= 0 && y < 16) && (z >= 0 && z < 16));
 }
 
 int main()
@@ -200,8 +200,8 @@ int main()
     glViewport(0, 0, 1920, 1080);
 
     Renderer::Shader s = Renderer::Shader();
-    s.LoadShader("res\\Shaders\\ver.vs");
-    s.LoadShader("res\\Shaders\\frag.fs");
+    s.LoadShader("C:\\rep\\Shooter\\build\\build\\bin\\Debug\\res\\Shaders\\ver.vs");
+    s.LoadShader("C:\\rep\\Shooter\\build\\build\\bin\\Debug\\res\\Shaders\\frag.fs");
     s.CreateProgram();
 
     glEnable(GL_DEBUG_OUTPUT);
@@ -213,21 +213,14 @@ int main()
     std::vector<Renderer::Texture> text;
     text.push_back(tex);
 
-    // Renderer::Mesh cube(cube_vertices, cube_elements, text);
-    // Renderer::Mesh triangle(vertices, indices, text);
-
     Renderer::Texture bedrock;
     bedrock.Bind();
     bedrock.LoadTexture("res\\textures\\bedrock.png");
     std::vector<Renderer::Texture> textbedr;
     textbedr.push_back(bedrock);
 
-    // Renderer::Mesh cubeBedrock(cube_vertices, cube_elements, textbedr);
-
     glEnable(GL_DEPTH_TEST);
-    // glEnable(GL_CULL_FACE);
-    // glCullFace(GL_FRONT);
-    // glFrontFace(GL_CW);
+    glEnable(GL_CULL_FACE);
 
     auto camera = std::make_unique<Camera>(glm::vec3(0.0f, 0.0f, 0.0f));
 
@@ -243,17 +236,15 @@ int main()
 
     for (int y = 0; y < Y; y++)
     {
-        for (int x = 0; x < X; x++)
+        for (int z = 0; z < Z; z++)
         {
-            for (int z = 0; z < Z; z++)
+            for (int x = 0; x < X; x++)
             {
-                chunk(x, y, z) = 1;
+                chunk(x, y, z) = 1; //<= sin(0.6f * x) * 10.0f;
             }
         }
     }
     Logger::Log("SKB\n", Logger::ERROR);
-
-    chunk(12, 4, 6) = 0;
 
     while (wnd->Render())
     {
@@ -307,7 +298,8 @@ int main()
         }
 
         camera->Update(cameraPos, wnd->input->mouse->GetX(), wnd->input->mouse->GetY());
-
+        auto title = std::to_string(cameraPos.x) + " " + std::to_string(cameraPos.y) + " " + std::to_string(cameraPos.z);
+        glfwSetWindowTitle(wnd->GetWindow(), title.c_str());
         //
 
         // Projection
@@ -331,10 +323,13 @@ int main()
 
         for (int y = 0; y < Y; y++)
         {
-            for (int x = 0; x < X; x++)
+            for (int z = 0; z < Z; z++)
             {
-                for (int z = 0; z < Z; z++)
+                for (int x = 0; x < X; x++)
                 {
+                    if (!chunk(x, y, z))
+                        continue;
+
                     if (!(isIn(x, y + 1, z) && chunk(x, y + 1, z)))
                     {
                         batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::TOP);

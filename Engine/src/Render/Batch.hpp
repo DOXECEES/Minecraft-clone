@@ -25,7 +25,9 @@ namespace Renderer
         Batch();
         void Vertex(const float x, const float y, const float z, const float u, const float v);
         void Face(const glm::vec3 coords, float u, float v, Faces face);
-        void MakeIndiciesForQuad();
+        void MakeIndiciesForQuad_CW();
+        void MakeIndiciesForQuad_CCW();
+
         Mesh *GetMesh();
 
     private:
