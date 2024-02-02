@@ -1,3 +1,4 @@
+#pragma once
 
 #include "VertexArray.hpp"
 #include "VertexBuffer.hpp"
@@ -11,10 +12,10 @@ namespace Renderer
     {
     public:
         std::vector<GLfloat> vertices;
-        std::vector<unsigned int> indices;
+        std::vector<GLuint> indices;
         std::vector<Texture> textures;
 
-        Mesh(std::vector<GLfloat> &vertices, std::vector<unsigned int> &indices, std::vector<Texture> &textures);
+        Mesh(std::vector<GLfloat> &vertices, std::vector<GLuint> &indices, std::vector<Texture> &textures);
         ~Mesh();
         void Draw(Shader &shader);
 

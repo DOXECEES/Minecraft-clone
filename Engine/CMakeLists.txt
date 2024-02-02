@@ -15,6 +15,7 @@ set(ENGINE_SORCE_FILES  src/main.cpp
                         src/Render/IndexBuffer.cpp
                         src/Render/Texture.cpp
                         src/Render/Mesh.cpp
+                        src/Render/Batch.cpp
                         src/EventsHandler/Keyboard.cpp
                         src/EventsHandler/Mouse.cpp
                         src/EventsHandler/Input.cpp
@@ -31,6 +32,7 @@ set(ENGINE_HEADER_FILES src/Render/Window.hpp
                         src/Render/IndexBuffer.hpp
                         src/Render/Texture.hpp
                         src/Render/Mesh.hpp
+                        src/Render/Batch.hpp
                         src/EventsHandler/Keyboard.hpp
                         src/EventsHandler/Mouse.hpp
                         src/EventsHandler/Input.hpp

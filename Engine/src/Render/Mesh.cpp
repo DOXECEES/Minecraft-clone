@@ -15,17 +15,16 @@ void Renderer::Mesh::setupMesh()
 {
     vao = new Renderer::VertexArray();
     vao->Link(vertices, indices);
-    // textures[0]
 }
 
 void Renderer::Mesh::Draw(Shader &shader)
 {
     // glActiveTexture(GL_TEXTURE0);
-    textures[0].Bind();
+    // textures[0].Bind();
     vao->Bind();
     vao->Draw(indices.size());
     vao->UnBind();
-    textures[0].UnBind();
+    // textures[0].UnBind();
 }
 
 Renderer::Mesh::~Mesh()

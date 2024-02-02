@@ -17,6 +17,7 @@
 #include "Render/VertexBuffer.hpp"
 #include "Render/Shader.hpp"
 #include "Render/Mesh.hpp"
+#include "Render/Batch.hpp"
 #include "Camera.hpp"
 
 #include "Logger.hpp"
@@ -252,7 +253,7 @@ int main()
     }
     Logger::Log("SKB\n", Logger::ERROR);
 
-    // chunk(1, 0, 0) = 0;
+    chunk(12, 4, 6) = 0;
 
     while (wnd->Render())
     {
@@ -292,6 +293,18 @@ int main()
         {
             cameraPos += glm::vec3(0.0f, 0.1f, 0.0f);
         }
+        if (wnd->input->kbr->isPressed(GLFW_KEY_F5))
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+        if (wnd->input->kbr->isPressed(GLFW_KEY_F6))
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+        }
+        if (wnd->input->kbr->isPressed(GLFW_KEY_F7))
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
 
         camera->Update(cameraPos, wnd->input->mouse->GetX(), wnd->input->mouse->GetY());
 
@@ -308,415 +321,58 @@ int main()
         GLint texLoc = glGetUniformLocation(s.GetProgram(), "ourTexture");
 
         // Pass the matrices to the shader
-        glUniform1ui(texLoc, 0);
+        glUniform1i(texLoc, 0);
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
         // palyer
         // Camera control
+        auto batch = Renderer::Batch();
 
-        std::vector<GLuint> indices;
-        std::vector<float> vert;
-        int curIndex = 0;
         for (int y = 0; y < Y; y++)
         {
             for (int x = 0; x < X; x++)
             {
                 for (int z = 0; z < Z; z++)
                 {
-                    bool isTopExists = false;
-                    bool isBottomExists = false;
-
                     if (!(isIn(x, y + 1, z) && chunk(x, y + 1, z)))
                     {
-
-                        // generate indicies
-                        // 012230
-                        indices.push_back(curIndex);
-                        curIndex++;
-                        indices.push_back(curIndex);
-                        curIndex++;
-                        indices.push_back(curIndex);
-                        indices.push_back(curIndex);
-                        curIndex++;
-                        indices.push_back(curIndex - 3);
-                        indices.push_back(curIndex);
-                        curIndex++;
-
-                        vert.push_back(x - 0.5f);
-                        vert.push_back(y + 0.5f);
-                        vert.push_back(z - 0.5f);
-
-                        vert.push_back(1);
-                        vert.push_back(1);
-
-                        vert.push_back(x - 0.5f);
-                        vert.push_back(y + 0.5f);
-                        vert.push_back(z + 0.5f);
-
-                        vert.push_back(1);
-                        vert.push_back(0);
-
-                        vert.push_back(x + 0.5f);
-                        vert.push_back(y + 0.5f);
-                        vert.push_back(z + 0.5f);
-
-                        vert.push_back(0);
-                        vert.push_back(0);
-
-                        vert.push_back(x + 0.5f);
-                        vert.push_back(y + 0.5f);
-                        vert.push_back(z - 0.5f);
-
-                        vert.push_back(0);
-                        vert.push_back(1);
-
-                        isTopExists = true;
+                        batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::TOP);
                     }
                     if (!(isIn(x, y - 1, z) && chunk(x, y - 1, z)))
                     {
-                        indices.push_back(curIndex);
-                        curIndex++;
-                        indices.push_back(curIndex);
-                        curIndex++;
-                        indices.push_back(curIndex);
-                        indices.push_back(curIndex);
-                        curIndex++;
-                        indices.push_back(curIndex - 3);
-                        indices.push_back(curIndex);
-                        curIndex++;
-
-                        vert.push_back(x - 0.5f);
-                        vert.push_back(y - 0.5f);
-                        vert.push_back(z - 0.5f);
-
-                        vert.push_back(1);
-                        vert.push_back(1);
-
-                        vert.push_back(x - 0.5f);
-                        vert.push_back(y - 0.5f);
-                        vert.push_back(z + 0.5f);
-
-                        vert.push_back(1);
-                        vert.push_back(0);
-
-                        vert.push_back(x + 0.5f);
-                        vert.push_back(y - 0.5f);
-                        vert.push_back(z + 0.5f);
-
-                        vert.push_back(0);
-                        vert.push_back(0);
-
-                        vert.push_back(x + 0.5f);
-                        vert.push_back(y - 0.5f);
-                        vert.push_back(z - 0.5f);
-
-                        vert.push_back(0);
-                        vert.push_back(1);
-
-                        isBottomExists = true;
+                        batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::BOT);
                     }
                     if (!(isIn(x - 1, y, z) && chunk(x - 1, y, z)))
                     {
-                        if (isTopExists && isBottomExists)
-                        {
-                            indices.push_back(curIndex - 7);
-                            indices.push_back(curIndex - 6);
-                            indices.push_back(curIndex - 2);
-                            indices.push_back(curIndex - 2);
-                            indices.push_back(curIndex - 3);
-                            indices.push_back(curIndex - 7);
-                        }
-                        else if (isTopExists)
-                        {
-                            indices.push_back(curIndex - 4);
-                            indices.push_back(curIndex - 3);
-                            indices.push_back(curIndex);
-                            indices.push_back(curIndex);
-                            curIndex++;
-                            indices.push_back(curIndex);
-                            indices.push_back(curIndex - 5);
-                            curIndex++;
-
-                            vert.push_back(x - 0.5f);
-                            vert.push_back(y - 0.5f);
-                            vert.push_back(z + 0.5f);
-
-                            vert.push_back(0);
-                            vert.push_back(0);
-
-                            vert.push_back(x - 0.5f);
-                            vert.push_back(y - 0.5f);
-                            vert.push_back(z - 0.5f);
-
-                            vert.push_back(0);
-                            vert.push_back(1);
-                        }
-                        else if (isBottomExists)
-                        {
-                            indices.push_back(curIndex - 4);
-                            indices.push_back(curIndex - 3);
-                            indices.push_back(curIndex);
-                            indices.push_back(curIndex);
-                            curIndex++;
-                            indices.push_back(curIndex);
-                            indices.push_back(curIndex - 5);
-                            curIndex++;
-
-                            vert.push_back(x - 0.5f);
-                            vert.push_back(y + 0.5f);
-                            vert.push_back(z + 0.5f);
-
-                            vert.push_back(0);
-                            vert.push_back(0);
-
-                            vert.push_back(x - 0.5f);
-                            vert.push_back(y + 0.5f);
-                            vert.push_back(z - 0.5f);
-
-                            vert.push_back(0);
-                            vert.push_back(1);
-                        }
-                        else
-                        {
-                            indices.push_back(curIndex);
-                            curIndex++;
-                            indices.push_back(curIndex);
-                            curIndex++;
-                            indices.push_back(curIndex);
-                            indices.push_back(curIndex);
-                            curIndex++;
-                            indices.push_back(curIndex - 3);
-                            indices.push_back(curIndex);
-                            curIndex++;
-
-                            vert.push_back(x - 0.5f);
-                            vert.push_back(y + 0.5f);
-                            vert.push_back(z - 0.5f);
-
-                            vert.push_back(1);
-                            vert.push_back(1);
-
-                            vert.push_back(x - 0.5f);
-                            vert.push_back(y + 0.5f);
-                            vert.push_back(z + 0.5f);
-
-                            vert.push_back(1);
-                            vert.push_back(0);
-
-                            vert.push_back(x - 0.5f);
-                            vert.push_back(y - 0.5f);
-                            vert.push_back(z + 0.5f);
-
-                            vert.push_back(0);
-                            vert.push_back(0);
-
-                            vert.push_back(x - 0.5f);
-                            vert.push_back(y - 0.5f);
-                            vert.push_back(z - 0.5f);
-
-                            vert.push_back(0);
-                            vert.push_back(1);
-                        }
+                        batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::LEFT);
                     }
                     if (!(isIn(x + 1, y, z) && chunk(x + 1, y, z)))
                     {
-                        if (isTopExists && isBottomExists)
-                        {
-                            // indices.push_back(curIndex - 6);
-                            // indices.push_back(curIndex - 5);
-                            // indices.push_back(curIndex - 1);
-                            // indices.push_back(curIndex - 1);
-                            // indices.push_back(curIndex - 2);
-                            // indices.push_back(curIndex - 6);
-                        }
-                        else if (isTopExists)
-                        {
-                            indices.push_back(curIndex - 1);
-                            indices.push_back(curIndex - 2);
-                            curIndex++;
-                            indices.push_back(curIndex);
-                            indices.push_back(curIndex);
-                            indices.push_back(curIndex - 1);
-                            indices.push_back(curIndex - 3);
-                            curIndex++;
-
-                            vert.push_back(x + 0.5f);
-                            vert.push_back(y - 0.5f);
-                            vert.push_back(z + 0.5f);
-
-                            vert.push_back(1);
-                            vert.push_back(0);
-
-                            vert.push_back(x + 0.5f);
-                            vert.push_back(y - 0.5f);
-                            vert.push_back(z - 0.5f);
-
-                            vert.push_back(1);
-                            vert.push_back(1);
-                        }
-                        // else if (isBottomExists)
-                        // {
-                        //     indices.push_back(curIndex - 4);
-                        //     indices.push_back(curIndex - 3);
-                        //     indices.push_back(curIndex);
-                        //     indices.push_back(curIndex);
-                        //     curIndex++;
-                        //     indices.push_back(curIndex);
-                        //     indices.push_back(curIndex - 5);
-                        //     curIndex++;
-
-                        //     vert.push_back(x - 0.5f);
-                        //     vert.push_back(y + 0.5f);
-                        //     vert.push_back(z + 0.5f);
-
-                        //     vert.push_back(0);
-                        //     vert.push_back(0);
-
-                        //     vert.push_back(x - 0.5f);
-                        //     vert.push_back(y + 0.5f);
-                        //     vert.push_back(z - 0.5f);
-
-                        //     vert.push_back(0);
-                        //     vert.push_back(1);
-                        // }
-                        // else
-                        // {
-                        //     indices.push_back(curIndex);
-                        //     curIndex++;
-                        //     indices.push_back(curIndex);
-                        //     curIndex++;
-                        //     indices.push_back(curIndex);
-                        //     indices.push_back(curIndex);
-                        //     curIndex++;
-                        //     indices.push_back(curIndex - 3);
-                        //     indices.push_back(curIndex);
-                        //     curIndex++;
-
-                        //     vert.push_back(x - 0.5f);
-                        //     vert.push_back(y + 0.5f);
-                        //     vert.push_back(z - 0.5f);
-
-                        //     vert.push_back(1);
-                        //     vert.push_back(1);
-
-                        //     vert.push_back(x - 0.5f);
-                        //     vert.push_back(y + 0.5f);
-                        //     vert.push_back(z + 0.5f);
-
-                        //     vert.push_back(1);
-                        //     vert.push_back(0);
-
-                        //     vert.push_back(x - 0.5f);
-                        //     vert.push_back(y - 0.5f);
-                        //     vert.push_back(z + 0.5f);
-
-                        //     vert.push_back(0);
-                        //     vert.push_back(0);
-
-                        //     vert.push_back(x - 0.5f);
-                        //     vert.push_back(y - 0.5f);
-                        //     vert.push_back(z - 0.5f);
-
-                        //     vert.push_back(0);
-                        //     vert.push_back(1);
-                        // }
+                        batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::RIGHT);
+                    }
+                    if (!(isIn(x, y, z - 1) && chunk(x, y, z - 1)))
+                    {
+                        batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::FRONT);
+                    }
+                    if (!(isIn(x, y, z + 1) && chunk(x, y, z + 1)))
+                    {
+                        batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::BACK);
                     }
                 }
             }
         }
-        // Logger::Log(std::to_string(vert.size()), Logger::INFO);
-
-        // GLuint VAO;
-        // glGenVertexArrays(1, &VAO);
-        // glBindVertexArray(VAO);
-
-        // std::unique_ptr<Renderer::VertexBuffer> VBO(new Renderer::VertexBuffer());
-        // VBO->Bind();
-        // VBO->SetData(vert);
-
-        // glEnableVertexAttribArray(0);
-        // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
-
-        // // glEnableVertexAttribArray(1);
-        // // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-
-        // glEnableVertexAttribArray(1);
-        // glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
-
-        // // glBindVertexArray(0);
-
-        // glDrawArrays(GL_TRIANGLES, 0, vert.size());
-        Logger::Log("SKB\n", Logger::ERROR);
 
         glm::mat4 model;
         model = glm::translate(glm::mat4(1.0f), {0.0f, 0.0f, 0.0f});
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        std::unique_ptr<Renderer::Mesh> mesh = std::make_unique<Renderer::Mesh>(Renderer::Mesh(vert, indices, textbedr));
-        Logger::Log("SKB2\n", Logger::ERROR);
+        // std::unique_ptr<Renderer::Mesh> mesh = std::make_unique<Renderer::Mesh>(vert, indices, textbedr);
 
+        auto mesh = batch.GetMesh();
+        tex.Bind();
         mesh->Draw(s);
-        Logger::Log("SKB3\n", Logger::ERROR);
-
+        delete mesh;
         //
-        Logger::Log("SKB\n", Logger::ERROR);
-
-        // for (int i = 0; i < pos.size(); i++)
-        // {
-        //     glm::mat4 model;
-        //     model = glm::translate(glm::mat4(1.0f), pos[i]);
-        //     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        //     // if (i 16)
-        //     cube.Draw(s);
-        //     // else
-        //     //   cubeBedrock.Draw(s);
-        // }
-
-        // mesh->Draw(s);
-
-        // delete mesh;
-        //  or (int i = 0; i < pos.size()/256; i++)
-        //  {
-        //      for (int j = 0; i < 256; i++)
-        //      {
-        //          if ( % 16)
-        //          {
-        //              glm::mat4 model;
-        //              model = glm::translate(glm::mat4(1.0f), pos[i]);
-        //              glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        //              cube.Draw(s);
-        //          }
-        //      }
-        //  }f
-
-        // triangle.Draw(s);
-
-        // glDepthFunc(GL_LEQUAL);
-
-        // skyBoxShader.Use();
-
-        // GLint viewLocSky = glGetUniformLocation(skyBoxShader.GetProgram(), "view");
-        // GLint projLocSky = glGetUniformLocation(skyBoxShader.GetProgram(), "projection");
-
-        // GLint texLocSky = glGetUniformLocation(skyBoxShader.GetProgram(), "skybox");
-
-        // glUniformMatrix4fv(viewLocSky, 1, GL_FALSE, glm::value_ptr(view));
-        //  glUniformMatrix4fv(projLocSky, 1, GL_FALSE, glm::value_ptr(projection));
-
-        // glUniform1i(texLocSky, 0);
-
-        // glActiveTexture(GL_TEXTURE0);
-        // glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
-        // glBindVertexArray(skyboxVAO);
-        // glDrawArrays(GL_TRIANGLES, 0, 36);
-
-        // glBindVertexArray(0);
-        // glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-
-        // glDepthFunc(GL_LESS);
-        //  const char *description;
-        //  glfwGetError(&description);
-        // Logger::Log(std::to_string(glGetError()), Logger::ERROR);
     }
     glfwTerminate();
 }
