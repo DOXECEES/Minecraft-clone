@@ -20,6 +20,7 @@ namespace Renderer
         void Bind();
         void UnBind();
         void SetElements(const std::vector<GLuint> &indices);
+        inline GLuint GetEBO() const { return EBO; };
 
     private:
         GLuint EBO;

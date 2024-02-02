@@ -30,14 +30,11 @@ void Renderer::VertexArray::Link(const std::vector<GLfloat> &data, const std::ve
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
 
-    // glEnableVertexAttribArray(1);
-    // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
 
     VertexBuffers.push_back(VBO->GetVBO());
-
+    IndexBuffers.push_back(EBO->GetEBO());
     glBindVertexArray(0);
 }
 
@@ -59,5 +56,6 @@ void Renderer::VertexArray::Draw(GLsizei count)
 Renderer::VertexArray::~VertexArray()
 {
     glDeleteBuffers(VertexBuffers.size(), VertexBuffers.data());
+    glDeleteBuffers(IndexBuffers.size(), IndexBuffers.data());
     glDeleteVertexArrays(1, &VAO);
 }
