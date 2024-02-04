@@ -8,7 +8,7 @@ public:
     Array3D(size_t x, size_t y, size_t z)
         : x(x), y(y), z(z)
     {
-        vec.resize(x * y * z, 0);
+        vec.resize(x * y * z, T());
     }
 
     void Push(const T &&data)

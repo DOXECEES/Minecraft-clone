@@ -19,6 +19,9 @@
 #include "Render/Shader.hpp"
 #include "Render/Mesh.hpp"
 #include "Render/Batch.hpp"
+//
+#include "Render/Block.hpp"
+//
 #include "Camera.hpp"
 
 #include "Logger.hpp"
@@ -179,7 +182,7 @@ glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
 bool isIn(int x, int y, int z)
 {
-    return ((x >= 0 && x < 16) && (y >= 0 && y < 256) && (z >= 0 && z < 16));
+    return ((x >= 0 && x < 96) && (y >= 0 && y < 256) && (z >= 0 && z < 96));
 }
 
 int main()
@@ -230,10 +233,10 @@ int main()
 
     pos.clear();
 
-    Array3D<int> chunk(16, 256, 16);
-    const size_t X = 16;
+    Array3D<Renderer::Block> chunk(96, 256, 96);
+    const size_t X = 96;
     const size_t Y = 256;
-    const size_t Z = 16;
+    const size_t Z = 96;
 
     for (int x = 0; x < X; x++)
     {
@@ -241,13 +244,12 @@ int main()
         {
             int worldX = x + 1.0f * X;
             int worldZ = z + 1.0f * Z;
-            auto h = 20 + glm::perlin(glm::vec2((float)x / 16.f, (float)z / 16.f)) * 20;
+            auto h = 20 + glm::perlin(glm::vec2((float)worldX / 16.f, (float)worldZ / 16.f)) * 10;
 
             for (int y = 0; y < Y; y++)
             {
-                // int worldY = y + 1.0f * Y;
-                // Logger::Log(std::to_string(h), Logger::INFO);
-                chunk(x, y, z) = y < h;
+                if (y < h)
+                    chunk(x, y, z).SetType(Renderer::Block::BlockType::COBBLESTONE);
             }
         }
     }
@@ -289,6 +291,10 @@ int main()
         if (wnd->input->kbr->isPressed(GLFW_KEY_SPACE))
         {
             cameraPos += glm::vec3(0.0f, 0.1f, 0.0f);
+        }
+        if (wnd->input->kbr->isPressed(GLFW_KEY_LEFT_SHIFT))
+        {
+            cameraPos -= glm::vec3(0.0f, 0.1f, 0.0f);
         }
         if (wnd->input->kbr->isPressed(GLFW_KEY_F5))
         {
@@ -343,30 +349,30 @@ int main()
                 {
                     for (int x = 0; x < X; x++)
                     {
-                        if (!chunk(x, y, z))
+                        if (!chunk(x, y, z).GetTypeUInt())
                             continue;
 
-                        if (!(isIn(x, y + 1, z) && chunk(x, y + 1, z)))
+                        if (!(isIn(x, y + 1, z) && chunk(x, y + 1, z).GetTypeUInt()))
                         {
                             batch.Face({x, y, z}, 0., 1, Renderer::Batch::Faces::TOP);
                         }
-                        if (!(isIn(x, y - 1, z) && chunk(x, y - 1, z)))
+                        if (!(isIn(x, y - 1, z) && chunk(x, y - 1, z).GetTypeUInt()))
                         {
                             batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::BOT);
                         }
-                        if (!(isIn(x - 1, y, z) && chunk(x - 1, y, z)))
+                        if (!(isIn(x - 1, y, z) && chunk(x - 1, y, z).GetTypeUInt()))
                         {
                             batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::LEFT);
                         }
-                        if (!(isIn(x + 1, y, z) && chunk(x + 1, y, z)))
+                        if (!(isIn(x + 1, y, z) && chunk(x + 1, y, z).GetTypeUInt()))
                         {
                             batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::RIGHT);
                         }
-                        if (!(isIn(x, y, z - 1) && chunk(x, y, z - 1)))
+                        if (!(isIn(x, y, z - 1) && chunk(x, y, z - 1).GetTypeUInt()))
                         {
                             batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::FRONT);
                         }
-                        if (!(isIn(x, y, z + 1) && chunk(x, y, z + 1)))
+                        if (!(isIn(x, y, z + 1) && chunk(x, y, z + 1).GetTypeUInt()))
                         {
                             batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::BACK);
                         }
