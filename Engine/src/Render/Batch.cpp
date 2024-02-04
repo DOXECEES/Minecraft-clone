@@ -63,10 +63,10 @@ void Renderer::Batch::Face(const glm::vec3 coords, float u, float v, Faces face)
     }
     case Faces::TOP:
     {
-        Vertex(coords.x - 0.5f, coords.y + 0.5f, coords.z - 0.5f, u, v);
-        Vertex(coords.x - 0.5f, coords.y + 0.5f, coords.z + 0.5f, u, v);
-        Vertex(coords.x + 0.5f, coords.y + 0.5f, coords.z + 0.5f, u, v);
-        Vertex(coords.x + 0.5f, coords.y + 0.5f, coords.z - 0.5f, u, v);
+        Vertex(coords.x - 0.5f, coords.y + 0.5f, coords.z - 0.5f, 0.5f, 0.0f);
+        Vertex(coords.x - 0.5f, coords.y + 0.5f, coords.z + 0.5f, 0.5f, 1.0f);
+        Vertex(coords.x + 0.5f, coords.y + 0.5f, coords.z + 0.5f, 1.0f, 1.0f);
+        Vertex(coords.x + 0.5f, coords.y + 0.5f, coords.z - 0.5f, 1.0f, 0.0f);
         MakeIndiciesForQuad_CW();
         break;
     }

@@ -8,6 +8,7 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 #include <gtx/euler_angles.hpp>
+#include <gtc/noise.hpp>
 #include <iostream>
 #include <memory>
 // #include <GL/glew.h>
@@ -178,7 +179,7 @@ glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
 bool isIn(int x, int y, int z)
 {
-    return ((x >= 0 && x < 16) && (y >= 0 && y < 16) && (z >= 0 && z < 16));
+    return ((x >= 0 && x < 16) && (y >= 0 && y < 256) && (z >= 0 && z < 16));
 }
 
 int main()
@@ -205,11 +206,11 @@ int main()
     s.CreateProgram();
 
     glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(MessageCallback, 0);
+    // glDebugMessageCallback(MessageCallback, 0);
 
     Renderer::Texture tex;
     tex.Bind();
-    tex.LoadTexture("res\\textures\\cobblestone.png");
+    tex.LoadTexture("res\\textures\\atlas.png");
     std::vector<Renderer::Texture> text;
     text.push_back(tex);
 
@@ -229,26 +230,31 @@ int main()
 
     pos.clear();
 
-    Array3D<int> chunk(16, 16, 16);
+    Array3D<int> chunk(16, 256, 16);
     const size_t X = 16;
-    const size_t Y = 16;
+    const size_t Y = 256;
     const size_t Z = 16;
 
-    for (int y = 0; y < Y; y++)
+    for (int x = 0; x < X; x++)
     {
         for (int z = 0; z < Z; z++)
         {
-            for (int x = 0; x < X; x++)
+            int worldX = x + 1.0f * X;
+            int worldZ = z + 1.0f * Z;
+            auto h = 20 + glm::perlin(glm::vec2((float)x / 16.f, (float)z / 16.f)) * 20;
+
+            for (int y = 0; y < Y; y++)
             {
-                chunk(x, y, z) = 1; //<= sin(0.6f * x) * 10.0f;
+                // int worldY = y + 1.0f * Y;
+                // Logger::Log(std::to_string(h), Logger::INFO);
+                chunk(x, y, z) = y < h;
             }
         }
     }
     Logger::Log("SKB\n", Logger::ERROR);
-
+    bool stop = false;
     while (wnd->Render())
     {
-
         // Render
         // Clear the colorbuffer
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -296,6 +302,14 @@ int main()
         {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
+        if (wnd->input->kbr->isPressed(GLFW_KEY_F8))
+        {
+            stop = true;
+        }
+        else
+        {
+            stop = false;
+        }
 
         camera->Update(cameraPos, wnd->input->mouse->GetX(), wnd->input->mouse->GetY());
         auto title = std::to_string(cameraPos.x) + " " + std::to_string(cameraPos.y) + " " + std::to_string(cameraPos.z);
@@ -319,55 +333,62 @@ int main()
 
         // palyer
         // Camera control
+        Renderer::Mesh *gmesh;
         auto batch = Renderer::Batch();
-
-        for (int y = 0; y < Y; y++)
+        if (!stop)
         {
-            for (int z = 0; z < Z; z++)
+            for (int y = 0; y < Y; y++)
             {
-                for (int x = 0; x < X; x++)
+                for (int z = 0; z < Z; z++)
                 {
-                    if (!chunk(x, y, z))
-                        continue;
+                    for (int x = 0; x < X; x++)
+                    {
+                        if (!chunk(x, y, z))
+                            continue;
 
-                    if (!(isIn(x, y + 1, z) && chunk(x, y + 1, z)))
-                    {
-                        batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::TOP);
-                    }
-                    if (!(isIn(x, y - 1, z) && chunk(x, y - 1, z)))
-                    {
-                        batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::BOT);
-                    }
-                    if (!(isIn(x - 1, y, z) && chunk(x - 1, y, z)))
-                    {
-                        batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::LEFT);
-                    }
-                    if (!(isIn(x + 1, y, z) && chunk(x + 1, y, z)))
-                    {
-                        batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::RIGHT);
-                    }
-                    if (!(isIn(x, y, z - 1) && chunk(x, y, z - 1)))
-                    {
-                        batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::FRONT);
-                    }
-                    if (!(isIn(x, y, z + 1) && chunk(x, y, z + 1)))
-                    {
-                        batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::BACK);
+                        if (!(isIn(x, y + 1, z) && chunk(x, y + 1, z)))
+                        {
+                            batch.Face({x, y, z}, 0., 1, Renderer::Batch::Faces::TOP);
+                        }
+                        if (!(isIn(x, y - 1, z) && chunk(x, y - 1, z)))
+                        {
+                            batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::BOT);
+                        }
+                        if (!(isIn(x - 1, y, z) && chunk(x - 1, y, z)))
+                        {
+                            batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::LEFT);
+                        }
+                        if (!(isIn(x + 1, y, z) && chunk(x + 1, y, z)))
+                        {
+                            batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::RIGHT);
+                        }
+                        if (!(isIn(x, y, z - 1) && chunk(x, y, z - 1)))
+                        {
+                            batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::FRONT);
+                        }
+                        if (!(isIn(x, y, z + 1) && chunk(x, y, z + 1)))
+                        {
+                            batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::BACK);
+                        }
                     }
                 }
             }
+
+            glm::mat4 model;
+            model = glm::translate(glm::mat4(1.0f), {0.0f, 0.0f, 0.0f});
+            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+            // std::unique_ptr<Renderer::Mesh> mesh = std::make_unique<Renderer::Mesh>(vert, indices, textbedr);
+
+            auto mesh = batch.GetMesh();
+            tex.Bind();
+            gmesh = batch.GetMesh();
+            mesh->Draw(s);
+            delete mesh;
         }
-
-        glm::mat4 model;
-        model = glm::translate(glm::mat4(1.0f), {0.0f, 0.0f, 0.0f});
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        // std::unique_ptr<Renderer::Mesh> mesh = std::make_unique<Renderer::Mesh>(vert, indices, textbedr);
-
-        auto mesh = batch.GetMesh();
-        tex.Bind();
-        mesh->Draw(s);
-        delete mesh;
-        //
+        else
+        {
+            gmesh->Draw(s);
+        }
     }
     glfwTerminate();
 }
