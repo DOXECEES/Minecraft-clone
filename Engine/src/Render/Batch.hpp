@@ -37,7 +37,6 @@ namespace Renderer
     private:
         std::vector<GLfloat> vertices;
         std::vector<GLuint> indicies;
-        std::vector<Texture> text;
         float uvSize;
         uint8_t countOfTiles;
         uint8_t gridSize;

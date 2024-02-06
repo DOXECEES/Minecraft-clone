@@ -86,14 +86,6 @@ std::vector<GLuint> cube_elements = {
     10, 11, 0, 0, 11, 1,
     5, 6, 12, 12, 6, 13};
 
-std::vector<glm::vec3> pos = {
-    {-1.0f, 2.0f, -5.0f},
-    {1.0f, 2.0, -5.0f},
-    {4.0f, 2.0, -5.0f},
-    {7.0f, 2.0, -5.0f}
-
-};
-
 float skyboxVertices[] =
     {
         -1.0f, 1.0f, -1.0f,
@@ -204,8 +196,8 @@ int main()
     glViewport(0, 0, 1920, 1080);
 
     Renderer::Shader s = Renderer::Shader();
-    s.LoadShader("C:\\rep\\Shooter\\build\\build\\bin\\Debug\\res\\Shaders\\ver.vs");
-    s.LoadShader("C:\\rep\\Shooter\\build\\build\\bin\\Debug\\res\\Shaders\\frag.fs");
+    s.LoadShader("res\\Shaders\\ver.vs");
+    s.LoadShader("res\\Shaders\\frag.fs");
     s.CreateProgram();
 
     glEnable(GL_DEBUG_OUTPUT);
@@ -214,18 +206,11 @@ int main()
     Renderer::Texture tex;
     tex.Bind();
     tex.LoadTexture("res\\textures\\block.png");
-    std::vector<Renderer::Texture> text;
-    text.push_back(tex);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
     auto camera = std::make_unique<Camera>(glm::vec3(0.0f, 0.0f, 0.0f));
-
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    Logger::Log("SKB\n", Logger::ERROR);
-
-    pos.clear();
 
     Array3D<Renderer::Block> chunk(96, 256, 96);
     const size_t X = 96;
@@ -256,7 +241,6 @@ int main()
             }
         }
     }
-    Logger::Log("SKB\n", Logger::ERROR);
     bool stop = false;
     while (wnd->Render())
     {
@@ -264,8 +248,6 @@ int main()
         // Clear the colorbuffer
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        s.Use();
 
         // camera
         glm::mat4 view = camera->GetViewMatrix();
@@ -340,8 +322,6 @@ int main()
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-        // palyer
-        // Camera control
         Renderer::Mesh *gmesh;
         auto batch = Renderer::Batch(&tex);
         if (!stop)

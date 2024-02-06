@@ -94,5 +94,5 @@ void Renderer::Batch::Face(const glm::vec3 coords, Renderer::Block::BlockType ty
 Renderer::Mesh *Renderer::Batch::GetMesh()
 {
     Logger::Log(std::to_string(vertices.size()), Logger::INFO);
-    return new Renderer::Mesh(vertices, indicies, text);
+    return new Renderer::Mesh(vertices, indicies);
 }

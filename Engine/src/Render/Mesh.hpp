@@ -11,17 +11,13 @@ namespace Renderer
     class Mesh
     {
     public:
-        std::vector<GLfloat> vertices;
-        std::vector<GLuint> indices;
-        std::vector<Texture> textures;
-
-        Mesh(std::vector<GLfloat> &vertices, std::vector<GLuint> &indices, std::vector<Texture> &textures);
+        Mesh(std::vector<GLfloat> &vertices, std::vector<GLuint> &indices);
         ~Mesh();
         void Draw(Shader &shader);
 
     private:
+        std::vector<GLfloat> vertices;
+        std::vector<GLuint> indices;
         Renderer::VertexArray *vao;
-
-        void setupMesh();
     };
 };
