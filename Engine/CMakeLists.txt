@@ -17,9 +17,11 @@ set(ENGINE_SORCE_FILES  src/main.cpp
                         src/Render/Mesh.cpp
                         src/Render/Batch.cpp
                         src/Render/Block.cpp
+                        src/Render/ChunksRenderer.cpp
                         src/EventsHandler/Keyboard.cpp
                         src/EventsHandler/Mouse.cpp
                         src/EventsHandler/Input.cpp
+                        src/World/Chunk.cpp
                         src/Logger.cpp
                         src/Camera.cpp
                         dependencies/lodepng/lodepng.cpp
@@ -35,9 +37,11 @@ set(ENGINE_HEADER_FILES src/Render/Window.hpp
                         src/Render/Mesh.hpp
                         src/Render/Batch.hpp
                         src/Render/Block.hpp
+                        src/Render/ChunksRenderer.hpp
                         src/EventsHandler/Keyboard.hpp
                         src/EventsHandler/Mouse.hpp
                         src/EventsHandler/Input.hpp
+                        src/World/Chunk.hpp
                         src/Logger.hpp
                         src/Camera.hpp
                         src/Templates/Array3D.hpp

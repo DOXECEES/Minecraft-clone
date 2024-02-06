@@ -19,6 +19,8 @@
 #include "Render/Shader.hpp"
 #include "Render/Mesh.hpp"
 #include "Render/Batch.hpp"
+#include "Render/ChunksRenderer.hpp"
+#include "World/Chunk.hpp"
 //
 #include "Render/Block.hpp"
 //
@@ -34,57 +36,6 @@ void error_callback(int error, const char *description)
     std::cout << "[ERROR CODE]: " << error << std::endl
               << "[DESCRIPTION] " << description << std::endl;
 }
-
-std::vector<GLfloat> cube_vertices = {
-    // front
-    -1, -1, -1, 0, 0,
-    1, -1, -1, 1, 0,
-    1, 1, -1, 2, 0,
-    -1, 1, -1, 3, 0,
-    -1, -1, -1, 4, 0,
-
-    -1, -1, 1, 0, -1,
-    1, -1, 1, 1, -1,
-    1, 1, 1, 2, -1,
-    -1, 1, 1, 3, -1,
-    -1, -1, 1, 4, -1,
-
-    -1, 1, -1, 0, 1,
-    1, 1, -1, 1, 1,
-
-    -1, 1, 1, 0, -2,
-    1, 1, 1, 1, -2};
-
-std::vector<GLfloat> vertices = {
-
-    0.5f, 0.5f, 0.0f, 1.0f, 1.0f,   // Top Right
-    0.5f, -0.5f, 0.0f, 1.0f, 0.0f,  // Bottom Right
-    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, // Bottom Left
-    -0.5f, 0.5f, 0.0f, 0.0f, 1.0f   // Bottom Left Vertex 2
-
-    // right triangle
-    //  8
-
-    // left triangle
-
-};
-std::vector<GLuint> indices = {
-    // First triangle
-    0, 1, 3, // first triangle
-    3, 2, 1
-    // Triangle 1
-    // Triangle 3
-
-};
-
-std::vector<GLuint> cube_elements = {
-    // front
-    0, 1, 5, 5, 1, 6,
-    1, 2, 6, 6, 2, 7,
-    2, 3, 7, 7, 3, 8,
-    3, 4, 8, 8, 4, 9,
-    10, 11, 0, 0, 11, 1,
-    5, 6, 12, 12, 6, 13};
 
 float skyboxVertices[] =
     {
@@ -172,11 +123,6 @@ glm::vec3 cameraPos(0.0f, 0.0f, 0.0f);
 glm::vec3 camFront(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
-bool isIn(int x, int y, int z)
-{
-    return ((x >= 0 && x < 96) && (y >= 0 && y < 256) && (z >= 0 && z < 96));
-}
-
 int main()
 {
 
@@ -212,36 +158,21 @@ int main()
 
     auto camera = std::make_unique<Camera>(glm::vec3(0.0f, 0.0f, 0.0f));
 
-    Array3D<Renderer::Block> chunk(96, 256, 96);
-    const size_t X = 96;
+    // Array3D<Renderer::Block> chunk(96, 256, 96);
+    const size_t X = 16;
     const size_t Y = 256;
-    const size_t Z = 96;
+    const size_t Z = 16;
 
-    for (int x = 0; x < X; x++)
-    {
-        for (int z = 0; z < Z; z++)
-        {
-            int worldX = x + 1.0f * X;
-            int worldZ = z + 1.0f * Z;
-            auto h = 20 + glm::perlin(glm::vec2((float)worldX / 16.f, (float)worldZ / 16.f)) * 10;
+    auto chun = Chunk({0.0f, 0.0f, 0.0f});
+    // auto chun = Chunk({1.0f, 1.0f, 1.0f});
 
-            for (int y = 0; y < Y; y++)
-            {
-                if (y < h)
-                {
-                    if (y < 3)
-                    {
-                        chunk(x, y, z).SetType(Renderer::Block::BlockType::COBBLESTONE);
-                    }
-                    else
-                    {
-                        chunk(x, y, z).SetType(Renderer::Block::BlockType::BEDROCK);
-                    }
-                }
-            }
-        }
-    }
+    auto chunk = chun.GetChunk();
+
     bool stop = false;
+
+    auto batch = Renderer::Batch(&tex);
+    auto renderer = Renderer::ChunksRenderer();
+
     while (wnd->Render())
     {
         // Render
@@ -322,61 +253,12 @@ int main()
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-        Renderer::Mesh *gmesh;
-        auto batch = Renderer::Batch(&tex);
-        if (!stop)
-        {
-            for (int y = 0; y < Y; y++)
-            {
-                for (int z = 0; z < Z; z++)
-                {
-                    for (int x = 0; x < X; x++)
-                    {
-                        if (!chunk(x, y, z).GetTypeUInt())
-                            continue;
+        glm::mat4 model;
+        model = glm::translate(glm::mat4(1.0f), {0.0f, 0.0f, 0.0f});
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
-                        if (!(isIn(x, y + 1, z) && chunk(x, y + 1, z).GetTypeUInt()))
-                        {
-                            batch.Face({x, y, z}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::TOP);
-                        }
-                        if (!(isIn(x, y - 1, z) && chunk(x, y - 1, z).GetTypeUInt()))
-                        {
-                            batch.Face({x, y, z}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::BOT);
-                        }
-                        if (!(isIn(x - 1, y, z) && chunk(x - 1, y, z).GetTypeUInt()))
-                        {
-                            batch.Face({x, y, z}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::LEFT);
-                        }
-                        if (!(isIn(x + 1, y, z) && chunk(x + 1, y, z).GetTypeUInt()))
-                        {
-                            batch.Face({x, y, z}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::RIGHT);
-                        }
-                        if (!(isIn(x, y, z - 1) && chunk(x, y, z - 1).GetTypeUInt()))
-                        {
-                            batch.Face({x, y, z}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::FRONT);
-                        }
-                        if (!(isIn(x, y, z + 1) && chunk(x, y, z + 1).GetTypeUInt()))
-                        {
-                            batch.Face({x, y, z}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::BACK);
-                        }
-                    }
-                }
-            }
-
-            glm::mat4 model;
-            model = glm::translate(glm::mat4(1.0f), {0.0f, 0.0f, 0.0f});
-            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-            auto mesh = batch.GetMesh();
-            tex.Bind();
-            gmesh = batch.GetMesh();
-            mesh->Draw(s);
-            delete mesh;
-        }
-        else
-        {
-            gmesh->Draw(s); // TODO
-        }
+        tex.Bind();
+        renderer.render(&batch, &chun, &s);
     }
     glfwTerminate();
 }

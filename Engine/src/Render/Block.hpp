@@ -10,8 +10,9 @@ namespace Renderer
         enum class BlockType : uint8_t
         {
             AIR = 0,
-            COBBLESTONE = 1,
-            BEDROCK = 2,
+            GRASS = 1,
+            COBBLESTONE = 2,
+            BEDROCK = 3,
         };
 
         Block(BlockType type = BlockType::AIR);
