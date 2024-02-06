@@ -11,12 +11,14 @@ public:
     constexpr static auto Y = 256;
     constexpr static auto Z = 16;
 
-    Chunk(glm::vec3 coords);
+    Chunk(const glm::vec3 coords);
     void SetModified(bool exp) noexcept;
     const Array3D<Renderer::Block> &GetChunk() const;
-    inline bool Modified() const { return isModified; };
+    inline bool Modified() const noexcept { return isModified; };
+    inline glm::vec3 GetPosition() const noexcept { return position; };
 
 private:
     Array3D<Renderer::Block> chunk;
+    glm::vec3 position;
     bool isModified = true;
 };

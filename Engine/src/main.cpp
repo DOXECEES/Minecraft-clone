@@ -164,7 +164,9 @@ int main()
     const size_t Z = 16;
 
     auto chun = Chunk({0.0f, 0.0f, 0.0f});
-    // auto chun = Chunk({1.0f, 1.0f, 1.0f});
+    auto chun1 = Chunk({1.0f, 0.0f, 1.0f});
+    auto chun2 = Chunk({0.0f, 0.0f, 1.0f});
+    auto chun3 = Chunk({1.0f, 0.0f, 0.0f});
 
     auto chunk = chun.GetChunk();
 
@@ -259,6 +261,9 @@ int main()
 
         tex.Bind();
         renderer.render(&batch, &chun, &s);
+        renderer.render(&batch, &chun1, &s);
+        renderer.render(&batch, &chun2, &s);
+        renderer.render(&batch, &chun3, &s);
     }
     glfwTerminate();
 }

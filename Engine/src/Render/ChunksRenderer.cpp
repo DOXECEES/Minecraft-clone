@@ -10,6 +10,10 @@ void Renderer::ChunksRenderer::render(Renderer::Batch *batch, Chunk *ch, Rendere
         return;
     }
 
+    auto worldXOffset = ch->GetPosition().x * Chunk::X;
+    auto worldYOffset = ch->GetPosition().y * Chunk::Y;
+    auto worldZOffset = ch->GetPosition().z * Chunk::Z;
+
     for (int y = 0; y < Chunk::Y; y++)
     {
         for (int z = 0; z < Chunk::Z; z++)
@@ -21,27 +25,27 @@ void Renderer::ChunksRenderer::render(Renderer::Batch *batch, Chunk *ch, Rendere
 
                 if (!(IsBlockInsideChunk(x, y + 1, z) && chunk(x, y + 1, z).GetTypeUInt()))
                 {
-                    batch->Face({x, y, z}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::TOP);
+                    batch->Face({x + worldXOffset, y + worldYOffset, z + worldZOffset}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::TOP);
                 }
                 if (!(IsBlockInsideChunk(x, y - 1, z) && chunk(x, y - 1, z).GetTypeUInt()))
                 {
-                    batch->Face({x, y, z}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::BOT);
+                    batch->Face({x + worldXOffset, y + worldYOffset, z + worldZOffset}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::BOT);
                 }
                 if (!(IsBlockInsideChunk(x - 1, y, z) && chunk(x - 1, y, z).GetTypeUInt()))
                 {
-                    batch->Face({x, y, z}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::LEFT);
+                    batch->Face({x + worldXOffset, y + worldYOffset, z + worldZOffset}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::LEFT);
                 }
                 if (!(IsBlockInsideChunk(x + 1, y, z) && chunk(x + 1, y, z).GetTypeUInt()))
                 {
-                    batch->Face({x, y, z}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::RIGHT);
+                    batch->Face({x + worldXOffset, y + worldYOffset, z + worldZOffset}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::RIGHT);
                 }
                 if (!(IsBlockInsideChunk(x, y, z - 1) && chunk(x, y, z - 1).GetTypeUInt()))
                 {
-                    batch->Face({x, y, z}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::FRONT);
+                    batch->Face({x + worldXOffset, y + worldYOffset, z + worldZOffset}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::FRONT);
                 }
                 if (!(IsBlockInsideChunk(x, y, z + 1) && chunk(x, y, z + 1).GetTypeUInt()))
                 {
-                    batch->Face({x, y, z}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::BACK);
+                    batch->Face({x + worldXOffset, y + worldYOffset, z + worldZOffset}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::BACK);
                 }
             }
         }

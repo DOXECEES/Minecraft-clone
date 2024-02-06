@@ -1,15 +1,15 @@
 
 #include "Chunk.hpp"
 
-Chunk::Chunk(glm::vec3 coords)
-    : chunk(X, Y, Z)
+Chunk::Chunk(const glm::vec3 coords)
+    : chunk(X, Y, Z), position(coords)
 {
     for (int x = 0; x < X; x++)
     {
         for (int z = 0; z < Z; z++)
         {
-            int worldX = x + coords.x * X;
-            int worldZ = z + coords.z * Z;
+            int worldX = x + position.x * X;
+            int worldZ = z + position.z * Z;
 
             auto h = 20 + glm::perlin(glm::vec2((float)worldX / 16.f, (float)worldZ / 16.f)) * 10;
 
