@@ -213,15 +213,9 @@ int main()
 
     Renderer::Texture tex;
     tex.Bind();
-    tex.LoadTexture("res\\textures\\atlas.png");
+    tex.LoadTexture("res\\textures\\block.png");
     std::vector<Renderer::Texture> text;
     text.push_back(tex);
-
-    Renderer::Texture bedrock;
-    bedrock.Bind();
-    bedrock.LoadTexture("res\\textures\\bedrock.png");
-    std::vector<Renderer::Texture> textbedr;
-    textbedr.push_back(bedrock);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -249,7 +243,16 @@ int main()
             for (int y = 0; y < Y; y++)
             {
                 if (y < h)
-                    chunk(x, y, z).SetType(Renderer::Block::BlockType::COBBLESTONE);
+                {
+                    if (y < 3)
+                    {
+                        chunk(x, y, z).SetType(Renderer::Block::BlockType::COBBLESTONE);
+                    }
+                    else
+                    {
+                        chunk(x, y, z).SetType(Renderer::Block::BlockType::BEDROCK);
+                    }
+                }
             }
         }
     }
@@ -340,7 +343,7 @@ int main()
         // palyer
         // Camera control
         Renderer::Mesh *gmesh;
-        auto batch = Renderer::Batch();
+        auto batch = Renderer::Batch(&tex);
         if (!stop)
         {
             for (int y = 0; y < Y; y++)
@@ -354,27 +357,27 @@ int main()
 
                         if (!(isIn(x, y + 1, z) && chunk(x, y + 1, z).GetTypeUInt()))
                         {
-                            batch.Face({x, y, z}, 0., 1, Renderer::Batch::Faces::TOP);
+                            batch.Face({x, y, z}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::TOP);
                         }
                         if (!(isIn(x, y - 1, z) && chunk(x, y - 1, z).GetTypeUInt()))
                         {
-                            batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::BOT);
+                            batch.Face({x, y, z}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::BOT);
                         }
                         if (!(isIn(x - 1, y, z) && chunk(x - 1, y, z).GetTypeUInt()))
                         {
-                            batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::LEFT);
+                            batch.Face({x, y, z}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::LEFT);
                         }
                         if (!(isIn(x + 1, y, z) && chunk(x + 1, y, z).GetTypeUInt()))
                         {
-                            batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::RIGHT);
+                            batch.Face({x, y, z}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::RIGHT);
                         }
                         if (!(isIn(x, y, z - 1) && chunk(x, y, z - 1).GetTypeUInt()))
                         {
-                            batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::FRONT);
+                            batch.Face({x, y, z}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::FRONT);
                         }
                         if (!(isIn(x, y, z + 1) && chunk(x, y, z + 1).GetTypeUInt()))
                         {
-                            batch.Face({x, y, z}, 1, 1, Renderer::Batch::Faces::BACK);
+                            batch.Face({x, y, z}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::BACK);
                         }
                     }
                 }
@@ -383,7 +386,6 @@ int main()
             glm::mat4 model;
             model = glm::translate(glm::mat4(1.0f), {0.0f, 0.0f, 0.0f});
             glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-            // std::unique_ptr<Renderer::Mesh> mesh = std::make_unique<Renderer::Mesh>(vert, indices, textbedr);
 
             auto mesh = batch.GetMesh();
             tex.Bind();
@@ -393,7 +395,7 @@ int main()
         }
         else
         {
-            gmesh->Draw(s);
+            gmesh->Draw(s); // TODO
         }
     }
     glfwTerminate();

@@ -22,6 +22,7 @@ namespace Renderer
         void UnBind();
         void SetData(const std::vector<unsigned char> &data, const GLuint width, const GLuint height);
         void LoadTexture(const std::string &path);
+        float GetSquare() const; 
 
     private:
         GLuint texture;
