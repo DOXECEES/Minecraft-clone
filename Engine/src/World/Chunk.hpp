@@ -17,8 +17,16 @@ public:
     inline bool Modified() const noexcept { return isModified; };
     inline glm::vec3 GetPosition() const noexcept { return position; };
 
+    static bool IsBlockInsideChunk(Coordinates) noexcept;
+
 private:
     Array3D<Renderer::Block> chunk;
     glm::vec3 position;
     bool isModified = true;
+
+public:
+    Chunk *right = nullptr;
+    Chunk *left = nullptr;
+    Chunk *up = nullptr;
+    Chunk *down = nullptr;
 };

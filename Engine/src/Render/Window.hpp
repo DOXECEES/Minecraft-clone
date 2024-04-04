@@ -23,6 +23,9 @@ namespace Renderer
         bool Render();
         GLFWwindow *GetWindow() const { return window; }
 
+        bool IsKeyPressed(const uint16_t keyCode) const { return input->kbr->isPressed(keyCode); }
+        
+
     public:
         // std::unique_ptr<EventsHandler::Keyboard> kbr;
         //  std::unique_ptr<EventsHandler::Mouse> mouse;

@@ -1,4 +1,5 @@
-
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "Chunk.hpp"
 
 Chunk::Chunk(const glm::vec3 coords)
@@ -39,4 +40,9 @@ void Chunk::SetModified(bool exp) noexcept
 const Array3D<Renderer::Block> &Chunk::GetChunk() const
 {
     return chunk;
+}
+
+bool Chunk::IsBlockInsideChunk(const uint32_t x, const uint32_t y, const uint32_t z) noexcept
+{
+    return ((x >= 0 && x < Chunk::X) && (y >= 0 && y < Chunk::Y) && (z >= 0 && z < Chunk::Z));
 }

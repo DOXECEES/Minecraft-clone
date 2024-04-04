@@ -1,3 +1,6 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+
 #define GLFW_INCLUDE_NONE
 
 #include <glad/glad.h>
@@ -119,12 +122,19 @@ MessageCallback(GLenum source,
             (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
             type, severity, message);
 }
+
 glm::vec3 cameraPos(0.0f, 0.0f, 0.0f);
 glm::vec3 camFront(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
+bool isChunkInsideActiveChunks(int x, int y)
+{
+    return ((x >= 0 && x < 3) && (y >= 0 && y < 3));
+}
+
 int main()
 {
+    setlocale(LC_ALL, "ru");
 
     Logger::EnableConsoleLogging();
     Logger::StartLogging();
@@ -154,7 +164,7 @@ int main()
     tex.LoadTexture("res\\textures\\block.png");
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    // glEnable(GL_CULL_FACE);
 
     auto camera = std::make_unique<Camera>(glm::vec3(0.0f, 0.0f, 0.0f));
 
@@ -163,15 +173,62 @@ int main()
     const size_t Y = 256;
     const size_t Z = 16;
 
-    auto chun = Chunk({0.0f, 0.0f, 0.0f});
-    auto chun1 = Chunk({1.0f, 0.0f, 1.0f});
-    auto chun2 = Chunk({0.0f, 0.0f, 1.0f});
-    auto chun3 = Chunk({1.0f, 0.0f, 0.0f});
+    std::vector<Chunk> chunks;
+    int renderDistance = 1;
+    int chunksSize = renderDistance * 2 + 1;
+    for (int i = 0; i < chunksSize; i++)
+    {
+        for (int j = 0; j < chunksSize; j++)
+        {
+            chunks.emplace_back(Chunk({-renderDistance + i, 0.0f, renderDistance - j}));
+        }
+    }
 
-    auto chunk = chun.GetChunk();
+    // set neighbour chunks
+    /// seems its inorrect
+    for (int x = 0; x < chunksSize; x++)
+    {
+        for (int y = 0; y < chunksSize; y++)
+        {
+            if (isChunkInsideActiveChunks(x, y + 1))
+            {
+                if (chunks[x + chunksSize * y].right == nullptr)
+                {
+                    chunks[x + chunksSize * y].right = &chunks[x + chunksSize * (y + 1)];
+                    chunks[x + chunksSize * (y + 1)].left = &chunks[x + chunksSize * y];
+                }
+            }
 
-    bool stop = false;
+            if (isChunkInsideActiveChunks(x, y - 1))
+            {
+                if (chunks[x + chunksSize * y].left == nullptr)
+                {
+                    chunks[x + chunksSize * y].left = &chunks[x + chunksSize * (y - 1)];
+                    chunks[x + chunksSize * (y - 1)].right = &chunks[x + chunksSize * y];
+                }
+            }
 
+            if (isChunkInsideActiveChunks(x + 1, y))
+            {
+                if (chunks[x + chunksSize * y].down == nullptr)
+                {
+                    chunks[x + chunksSize * y].down = &chunks[(x + 1) + chunksSize * y];
+                    chunks[(x + 1) + chunksSize * y].up = &chunks[x + chunksSize * y];
+                }
+            }
+
+            if (isChunkInsideActiveChunks(x - 1, y))
+            {
+                if (chunks[x + chunksSize * y].up == nullptr)
+                {
+                    chunks[x + chunksSize * y].up = &chunks[(x - 1) + chunksSize * y];
+                    chunks[(x - 1) + chunksSize * y].down = &chunks[x + chunksSize * y];
+                }
+            }
+        }
+    }
+
+    bool isInfoMenuEnabled = false;
     auto batch = Renderer::Batch(&tex);
     auto renderer = Renderer::ChunksRenderer();
 
@@ -187,57 +244,71 @@ int main()
         glm::vec3 cameraPos = camera->GetPosition();
         glm::vec3 cameraFront = camera->GetFront();
 
-        if (wnd->input->kbr->isPressed(GLFW_KEY_A))
+        if (wnd->IsKeyPressed(GLFW_KEY_A))
         {
             // camPos = camPos + glm::vec3(-0.01f, 0.0f, 0.0f);
             cameraPos = cameraPos - glm::normalize(glm::cross(cameraFront, glm::vec3(0.0f, 1.0f, 0.0f))) * 0.1f;
         }
-        if (wnd->input->kbr->isPressed(GLFW_KEY_D))
+        if (wnd->IsKeyPressed(GLFW_KEY_D))
         {
             cameraPos = cameraPos + glm::normalize(glm::cross(cameraFront, glm::vec3(0.0f, 1.0f, 0.0f))) * 0.1f;
         }
-        if (wnd->input->kbr->isPressed(GLFW_KEY_S))
+        if (wnd->IsKeyPressed(GLFW_KEY_S))
         {
             // camPos = camPos + glm::vec3(0.0f, 0.0f, 0.01f);
             cameraPos = cameraPos - cameraFront * 0.1f;
         }
-        if (wnd->input->kbr->isPressed(GLFW_KEY_W))
+        if (wnd->IsKeyPressed(GLFW_KEY_W))
         {
             // camPos = camPos + glm::vec3(0.0f, 0.0f, -0.01f);
             cameraPos = cameraPos + cameraFront * 0.1f;
         }
-        if (wnd->input->kbr->isPressed(GLFW_KEY_SPACE))
+        if (wnd->IsKeyPressed(GLFW_KEY_SPACE))
         {
             cameraPos += glm::vec3(0.0f, 0.1f, 0.0f);
         }
-        if (wnd->input->kbr->isPressed(GLFW_KEY_LEFT_SHIFT))
+        if (wnd->IsKeyPressed(GLFW_KEY_LEFT_SHIFT))
         {
             cameraPos -= glm::vec3(0.0f, 0.1f, 0.0f);
         }
-        if (wnd->input->kbr->isPressed(GLFW_KEY_F5))
+        if (wnd->IsKeyPressed(GLFW_KEY_F5))
         {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
-        if (wnd->input->kbr->isPressed(GLFW_KEY_F6))
+        if (wnd->IsKeyPressed(GLFW_KEY_F6))
         {
             glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
         }
-        if (wnd->input->kbr->isPressed(GLFW_KEY_F7))
+        if (wnd->IsKeyPressed(GLFW_KEY_F7))
         {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
-        if (wnd->input->kbr->isPressed(GLFW_KEY_F8))
+        if (wnd->IsKeyPressed(GLFW_KEY_F3))
         {
-            stop = true;
-        }
-        else
-        {
-            stop = false;
+            isInfoMenuEnabled = !isInfoMenuEnabled;
         }
 
         camera->Update(cameraPos, wnd->input->mouse->GetX(), wnd->input->mouse->GetY());
-        auto title = std::to_string(cameraPos.x) + " " + std::to_string(cameraPos.y) + " " + std::to_string(cameraPos.z);
-        glfwSetWindowTitle(wnd->GetWindow(), title.c_str());
+        // auto title = std::to_string(ceil(cameraPos.x)) + " " + std::to_string(ceil(cameraPos.y)) + " " + std::to_string(ceil(cameraPos.z));
+
+        auto camX = ceil(cameraPos.x / 16);
+        auto camZ = ceil(cameraPos.z / 16);
+
+        // auto chunk = &chunks[camX + chunksSize * camZ];
+
+        // glm::vec3 left;
+        // if (chunk->left != nullptr)
+        //     left = chunk->left->GetPosition();
+        // else
+        // {
+        //     Logger::Log("no left", Logger::INFO);
+        // }
+        // auto right = chunk->right->GetPosition();
+        // auto up = chunk->up->GetPosition();
+        // auto down = chunk->down->GetPosition();
+
+        // auto title = "LEFT: " + std::to_string(left.x) + " " + std::to_string(left.y) + " " + std::to_string(left.z) + " CUR: " + std::to_string(camX) + " " + std::to_string(0) + " " + std::to_string(camZ);
+        // glfwSetWindowTitle(wnd->GetWindow(), title.c_str());
         //
 
         // Projection
@@ -260,10 +331,30 @@ int main()
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
         tex.Bind();
-        renderer.render(&batch, &chun, &s);
-        renderer.render(&batch, &chun1, &s);
-        renderer.render(&batch, &chun2, &s);
-        renderer.render(&batch, &chun3, &s);
+        for (auto &i : chunks)
+            renderer.render(&batch, &i, &s);
+
+        if (isInfoMenuEnabled)
+        {
+            std::string str = "dsa";
+            // Set up the 2D rendering matrix
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
+            glOrtho(0, 1920, 0, 1080, -1, 1);
+            glMatrixMode(GL_MODELVIEW);
+            glLoadIdentity();
+
+            // Set up the font and color
+            glColor3f(1, 1, 1);
+            glRasterPos2f(100, 100);
+            for (int i = 0; i < str.size(); i++)
+            {
+                glBegin(GL_LINE);
+                glVertex2d(0.0f, 0.0f);
+                glVertex2d(0.0f, 1.0f);
+                glEnd();
+            }
+        }
     }
     glfwTerminate();
 }
