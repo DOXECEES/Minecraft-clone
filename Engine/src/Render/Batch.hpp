@@ -37,7 +37,6 @@ namespace Renderer
     private:
         std::vector<GLfloat> vertices;
         std::vector<GLuint> indicies;
-        float uvSize;
         uint8_t countOfTiles;
         uint8_t gridSize;
         float step;

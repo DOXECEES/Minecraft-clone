@@ -5,7 +5,6 @@ set (CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(dependencies/glfw)
 add_subdirectory(dependencies/glad)
-add_subdirectory(dependencies/freetype/freetype-2.13.2)
 
 set(ENGINE_SORCE_FILES  src/main.cpp
                         src/Render/Window.cpp
@@ -23,6 +22,7 @@ set(ENGINE_SORCE_FILES  src/main.cpp
                         src/EventsHandler/Input.cpp
                         src/World/Chunk.cpp
                         src/World/Coordinates.cpp
+                        src/World/World.cpp
                         src/Logger.cpp
                         src/Camera.cpp
                         dependencies/lodepng/lodepng.cpp
@@ -44,6 +44,7 @@ set(ENGINE_HEADER_FILES src/Render/Window.hpp
                         src/EventsHandler/Input.hpp
                         src/World/Chunk.hpp
                         src/World/Coordinates.hpp
+                        src/World/World.hpp
                         src/Logger.hpp
                         src/Camera.hpp
                         src/Templates/Array3D.hpp
@@ -73,7 +74,6 @@ target_include_directories(Engine
 target_link_directories(Engine 
     PRIVATE dependencies/glfw/src
     PRIVATE dependencies/glad/src
-    PRIVATE dependencies/glew/src
     )
 
 

@@ -24,6 +24,7 @@
 #include "Render/Batch.hpp"
 #include "Render/ChunksRenderer.hpp"
 #include "World/Chunk.hpp"
+#include "World/World.hpp"
 //
 #include "Render/Block.hpp"
 //
@@ -127,6 +128,40 @@ glm::vec3 cameraPos(0.0f, 0.0f, 0.0f);
 glm::vec3 camFront(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
+void DrawLine(glm::vec3 start, glm::vec3 end, Renderer::Shader *sh)
+{
+    GLuint VAO;
+    GLuint VBO;
+
+    std::vector<float> vertices = {
+        start.x,
+        start.y,
+        start.z,
+        end.x,
+        end.y,
+        end.z,
+
+    };
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices.data(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    sh->Use();
+
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_LINES, 0, 2);
+}
+
 bool isChunkInsideActiveChunks(int x, int y)
 {
     return ((x >= 0 && x < 3) && (y >= 0 && y < 3));
@@ -173,64 +208,77 @@ int main()
     const size_t Y = 256;
     const size_t Z = 16;
 
-    std::vector<Chunk> chunks;
-    int renderDistance = 1;
-    int chunksSize = renderDistance * 2 + 1;
-    for (int i = 0; i < chunksSize; i++)
-    {
-        for (int j = 0; j < chunksSize; j++)
-        {
-            chunks.emplace_back(Chunk({-renderDistance + i, 0.0f, renderDistance - j}));
-        }
-    }
+    // std::vector<Chunk> chunks;
+
+    // int renderDistance = 1;
+    // int chunksSize = renderDistance * 2 + 1;
+    // // Array3D<Chunk> chunks(chunksSize, 1 , chunksSize);
+
+    // // 0 3 6
+    // // 1 4 7
+    // // 2 5 8
+
+    // for (int i = 0; i < chunksSize; i++)
+    // {
+    //     for (int j = 0; j < chunksSize; j++)
+    //     {
+    //         chunks.emplace_back(Chunk({-renderDistance + i, 0.0f, renderDistance - j}));
+    //     }
+    // }
 
     // set neighbour chunks
     /// seems its inorrect
-    for (int x = 0; x < chunksSize; x++)
-    {
-        for (int y = 0; y < chunksSize; y++)
-        {
-            if (isChunkInsideActiveChunks(x, y + 1))
-            {
-                if (chunks[x + chunksSize * y].right == nullptr)
-                {
-                    chunks[x + chunksSize * y].right = &chunks[x + chunksSize * (y + 1)];
-                    chunks[x + chunksSize * (y + 1)].left = &chunks[x + chunksSize * y];
-                }
-            }
+    auto world = new World();
 
-            if (isChunkInsideActiveChunks(x, y - 1))
-            {
-                if (chunks[x + chunksSize * y].left == nullptr)
-                {
-                    chunks[x + chunksSize * y].left = &chunks[x + chunksSize * (y - 1)];
-                    chunks[x + chunksSize * (y - 1)].right = &chunks[x + chunksSize * y];
-                }
-            }
+    // for (int x = 0; x < chunksSize; x++)
+    // {
+    //     for (int y = 0; y < chunksSize; y++)
+    //     {
+    //         if (isChunkInsideActiveChunks(x, y + 1))
+    //         {
+    //             if (chunks[x + chunksSize * y].right == nullptr)
+    //             {
+    //                 chunks[x + chunksSize * y].right = &chunks[x + chunksSize * (y + 1)];
+    //                 chunks[x + chunksSize * (y + 1)].left = &chunks[x + chunksSize * y];
+    //             }
+    //         }
 
-            if (isChunkInsideActiveChunks(x + 1, y))
-            {
-                if (chunks[x + chunksSize * y].down == nullptr)
-                {
-                    chunks[x + chunksSize * y].down = &chunks[(x + 1) + chunksSize * y];
-                    chunks[(x + 1) + chunksSize * y].up = &chunks[x + chunksSize * y];
-                }
-            }
+    //         if (isChunkInsideActiveChunks(x, y - 1))
+    //         {
+    //             if (chunks[x + chunksSize * y].left == nullptr)
+    //             {
+    //                 chunks[x + chunksSize * y].left = &chunks[x + chunksSize * (y - 1)];
+    //                 chunks[x + chunksSize * (y - 1)].right = &chunks[x + chunksSize * y];
+    //             }
+    //         }
 
-            if (isChunkInsideActiveChunks(x - 1, y))
-            {
-                if (chunks[x + chunksSize * y].up == nullptr)
-                {
-                    chunks[x + chunksSize * y].up = &chunks[(x - 1) + chunksSize * y];
-                    chunks[(x - 1) + chunksSize * y].down = &chunks[x + chunksSize * y];
-                }
-            }
-        }
-    }
+    //         if (isChunkInsideActiveChunks(x + 1, y))
+    //         {
+    //             if (chunks[x + chunksSize * y].up == nullptr)
+    //             {
+    //                 chunks[x + chunksSize * y].up = &chunks[(x + 1) + chunksSize * y];
+    //                 chunks[(x + 1) + chunksSize * y].down = &chunks[x + chunksSize * y];
+    //             }
+    //         }
+
+    //         if (isChunkInsideActiveChunks(x - 1, y))
+    //         {
+    //             if (chunks[x + chunksSize * y].down == nullptr)
+    //             {
+    //                 chunks[x + chunksSize * y].down = &chunks[(x - 1) + chunksSize * y];
+    //                 chunks[(x - 1) + chunksSize * y].up = &chunks[x + chunksSize * y];
+    //             }
+    //         }
+    //     }
+    // }
 
     bool isInfoMenuEnabled = false;
     auto batch = Renderer::Batch(&tex);
     auto renderer = Renderer::ChunksRenderer();
+
+    glm::vec3 curDirection = cameraPos;
+    glm::vec3 prevDirection = curDirection;
+    Chunk *frontChunk = nullptr;
 
     while (wnd->Render())
     {
@@ -240,9 +288,49 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // camera
+        prevDirection = curDirection;
+
         glm::mat4 view = camera->GetViewMatrix();
         glm::vec3 cameraPos = camera->GetPosition();
         glm::vec3 cameraFront = camera->GetFront();
+
+        auto dir = camera->GetDirection();
+        curDirection = cameraPos;
+
+        {
+            frontChunk = *world->GetChunkByGlobal({static_cast<int>(cameraPos.x), static_cast<int>(cameraPos.y), static_cast<int>(cameraPos.z)});
+            // Logger::Log("Front", Logger::INFO);
+        }
+
+        // get movement direction
+
+        // enum class Direction
+        // {
+        //     NONE = 0x0000,
+        //     NORTH = 0x0001,
+        //     NORTH_WEST = 0x0101,
+        //     NORTH_EAST = 0x1001,
+        //     SOUTH = 0x0010,
+        //     SOUTH_WEST = 0x0110,
+        //     SOUTH_EAST = 0x1010,
+        //     WEST = 0x0100,
+        //     EAST = 0x1000
+        // };
+
+        // std::bitset<4> d;
+        // auto movementVector = curDirection - prevDirection;
+        // if (movementVector != glm::vec3{0.0f, 0.0f, 0.0f})
+        // {
+        //     (movementVector.x > 0) ? Direction::EAST : Direction::WEST;
+        //     (movementVector.y > 0) ? true : false;
+        //     (movementVector.z > 0) ? Direction::NORTH : Direction::SOUTH;
+        // }
+
+        // 16 x 256 x 16
+
+        auto chunkX = cameraPos.x / 16;
+        auto chunkY = cameraPos.y / 256;
+        auto chunkZ = cameraPos.z / 16;
 
         if (wnd->IsKeyPressed(GLFW_KEY_A))
         {
@@ -289,7 +377,11 @@ int main()
         }
 
         camera->Update(cameraPos, wnd->input->mouse->GetX(), wnd->input->mouse->GetY());
-        // auto title = std::to_string(ceil(cameraPos.x)) + " " + std::to_string(ceil(cameraPos.y)) + " " + std::to_string(ceil(cameraPos.z));
+        std::string title;
+        if (frontChunk != nullptr)
+            title = std::to_string(frontChunk->GetLocalCoordinates().x) + " " + std::to_string(frontChunk->GetLocalCoordinates().y) + " " + std::to_string(frontChunk->GetLocalCoordinates().z);
+        // auto title = "";
+        title += "\t" + std::to_string(cameraPos.x) + " " + std::to_string(cameraPos.y) + " " + std::to_string(cameraPos.z);
 
         auto camX = ceil(cameraPos.x / 16);
         auto camZ = ceil(cameraPos.z / 16);
@@ -308,7 +400,7 @@ int main()
         // auto down = chunk->down->GetPosition();
 
         // auto title = "LEFT: " + std::to_string(left.x) + " " + std::to_string(left.y) + " " + std::to_string(left.z) + " CUR: " + std::to_string(camX) + " " + std::to_string(0) + " " + std::to_string(camZ);
-        // glfwSetWindowTitle(wnd->GetWindow(), title.c_str());
+        glfwSetWindowTitle(wnd->GetWindow(), title.c_str());
         //
 
         // Projection
@@ -331,8 +423,26 @@ int main()
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
         tex.Bind();
-        for (auto &i : chunks)
-            renderer.render(&batch, &i, &s);
+        auto chunk = world->GetRawChunks();
+        // for (auto i = 0; i < chunk.Size(); i++)
+        //     renderer.render(&batch, &chunk[i], &s);
+
+        if (isInfoMenuEnabled)
+        {
+            // coordinates are not integers because the coordinate points to the center of the block
+            for (auto &i : chunk)
+            {
+                auto coords = Chunk::ToGlobal(i.first);
+                DrawLine(glm::vec3{coords.x - 0.5f, 0.0f, coords.z - 0.5f}, glm::vec3{coords.x - 0.5f, 256.0f, coords.z - 0.5f}, &s);
+                DrawLine(glm::vec3{coords.x + 15.5f, 0.0f, coords.z - 0.5f}, glm::vec3{coords.x + 15.5f, 256.0f, coords.z - 0.5f}, &s);
+                DrawLine(glm::vec3{coords.x - 0.5f, 0.0f, coords.z + 15.5f}, glm::vec3{coords.x - 0.5f, 256.0f, coords.z + 15.5f}, &s);
+                DrawLine(glm::vec3{coords.x + 15.5f, 0.0f, coords.z + 15.5f}, glm::vec3{coords.x + 15.5f, 256.0f, coords.z + 15.5f}, &s);
+            }
+        }
+        for (auto &i : chunk)
+        {
+            renderer.render(&batch, i.second, &s);
+        }
 
         if (isInfoMenuEnabled)
         {

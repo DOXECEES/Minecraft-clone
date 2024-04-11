@@ -12,11 +12,9 @@ namespace Renderer
         void render(Renderer::Batch *batch, Chunk *ch, Renderer::Shader *shader);
 
     private:
-        bool IsBlockInsideChunk(int x, int y, int z);
-        bool IsBlockExists(Chunk *chunk, Renderer::Batch::Faces face, int x, int y, int z);
+        bool RenderEdge(Chunk *chunk, Chunk *neighbour, const Coordinates &coords, Renderer::Batch::Faces face);
         bool IsChunkEdge(int x, int y, int z);
-        bool IsFaceVisible(const Chunk *ch, int x, int y, int z);
-        bool IsBlockInNeighbourChunk(const Chunk *ch, int x, int y, int z, Renderer::Batch::Faces face);
+        bool IsFaceVisible(const Chunk *ch, const Coordinates &coords);
 
     private:
         Mesh *mesh = nullptr;
