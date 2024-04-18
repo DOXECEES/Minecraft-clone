@@ -35,19 +35,19 @@ void Renderer::ChunksRenderer::render(Renderer::Batch *batch, Chunk *ch, Rendere
                 {
                     batch->Face({x + worldXOffset, y + worldYOffset, z + worldZOffset}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::BOT);
                 }
-                if (ch == nullptr || RenderEdge(ch, ch->left, Coordinates(x, y, z), Renderer::Batch::Faces::LEFT))
+                if (RenderEdge(ch, ch->left, Coordinates(x, y, z), Renderer::Batch::Faces::LEFT))
                 {
                     batch->Face({x + worldXOffset, y + worldYOffset, z + worldZOffset}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::LEFT);
                 }
-                if (ch == nullptr || RenderEdge(ch, ch->right, Coordinates(x, y, z), Renderer::Batch::Faces::RIGHT))
+                if (RenderEdge(ch, ch->right, Coordinates(x, y, z), Renderer::Batch::Faces::RIGHT))
                 {
                     batch->Face({x + worldXOffset, y + worldYOffset, z + worldZOffset}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::RIGHT);
                 }
-                if (ch == nullptr || RenderEdge(ch, ch->up, Coordinates(x, y, z), Renderer::Batch::Faces::FRONT))
+                if (RenderEdge(ch, ch->up, Coordinates(x, y, z), Renderer::Batch::Faces::FRONT))
                 {
                     batch->Face({x + worldXOffset, y + worldYOffset, z + worldZOffset}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::FRONT);
                 }
-                if (ch == nullptr || RenderEdge(ch, ch->down, Coordinates(x, y, z), Renderer::Batch::Faces::BACK))
+                if (RenderEdge(ch, ch->down, Coordinates(x, y, z), Renderer::Batch::Faces::BACK))
                 {
                     batch->Face({x + worldXOffset, y + worldYOffset, z + worldZOffset}, chunk(x, y, z).GetType(), Renderer::Batch::Faces::BACK);
                 }
@@ -64,45 +64,45 @@ void Renderer::ChunksRenderer::render(Renderer::Batch *batch, Chunk *ch, Rendere
 
 bool Renderer::ChunksRenderer::RenderEdge(Chunk *chunk, Chunk *neighbour, const Coordinates &coords, Renderer::Batch::Faces face)
 {
-    if (IsChunkEdge(coords.x, coords.y, coords.z))
+    auto x = coords.x;
+    auto y = coords.y;
+    auto z = coords.z;
+    switch (face)
     {
-        if (neighbour == nullptr)
-            return true;
-
-        switch (face)
+    case Renderer::Batch::Faces::LEFT:
+    {
+        if (!Chunk::IsBlockInsideChunk(Coordinates(x - 1, y, z)) && neighbour != nullptr)
         {
-        case Renderer::Batch::Faces::LEFT:
-            return (!(chunk->left->GetChunk()(15, coords.y, coords.z).GetTypeUInt()));
-        case Renderer::Batch::Faces::RIGHT:
-            return (!(chunk->right->GetChunk()(0, coords.y, coords.z).GetTypeUInt()));
-        case Renderer::Batch::Faces::FRONT:
-            return (!(chunk->up->GetChunk()(coords.x, coords.y, 0).GetTypeUInt()));
-        case Renderer::Batch::Faces::BACK:
-            return (!(chunk->down->GetChunk()(coords.x, coords.y, 15).GetTypeUInt()));
-
-        default:
-            return false;
+            return !neighbour->GetChunk()(15.0f, coords.y, coords.z).GetTypeUInt();
         }
+        return IsFaceVisible(chunk, Coordinates(x - 1, y, z));
     }
-    else
+    case Renderer::Batch::Faces::RIGHT:
     {
-        auto x = coords.x;
-        auto y = coords.y;
-        auto z = coords.z;
-        switch (face)
+        if (!Chunk::IsBlockInsideChunk(Coordinates(x + 1, y, z)) && neighbour != nullptr)
         {
-        case Renderer::Batch::Faces::LEFT:
-            return IsFaceVisible(chunk, Coordinates(x - 1, y, z));
-        case Renderer::Batch::Faces::RIGHT:
-            return IsFaceVisible(chunk, Coordinates(x + 1, y, z));
-        case Renderer::Batch::Faces::FRONT:
-            return IsFaceVisible(chunk, Coordinates(x, y, z - 1));
-        case Renderer::Batch::Faces::BACK:
-            return IsFaceVisible(chunk, Coordinates(x, y, z + 1));
-
-        default:
-            return false;
+            return !neighbour->GetChunk()(0.0f, coords.y, coords.z).GetTypeUInt();
         }
+        return IsFaceVisible(chunk, Coordinates(x + 1, y, z));
+    }
+    case Renderer::Batch::Faces::FRONT:
+    {
+        if (!Chunk::IsBlockInsideChunk(Coordinates(x, y, z - 1)) && neighbour != nullptr)
+        {
+            return !neighbour->GetChunk()(coords.x, coords.y, 15.0f).GetTypeUInt();
+        }
+        return IsFaceVisible(chunk, Coordinates(x, y, z - 1));
+    }
+    case Renderer::Batch::Faces::BACK:
+    {
+        if (!Chunk::IsBlockInsideChunk(Coordinates(x, y, z + 1)) && neighbour != nullptr)
+        {
+            return !neighbour->GetChunk()(coords.x, coords.y, 0.0f).GetTypeUInt();
+        }
+        return IsFaceVisible(chunk, Coordinates(x, y, z + 1));
+    }
+    default:
+        return true;
     }
 }
 

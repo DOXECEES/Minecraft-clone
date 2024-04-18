@@ -12,9 +12,9 @@
 class Chunk
 {
 public:
-    constexpr static auto X = 16;
-    constexpr static auto Y = 256;
-    constexpr static auto Z = 16;
+    constexpr static auto X = 16.0f;
+    constexpr static auto Y = 256.0f;
+    constexpr static auto Z = 16.0f;
 
     Chunk(const glm::vec3 coords);
     void SetModified(bool exp) noexcept;
@@ -22,6 +22,8 @@ public:
     inline bool Modified() const noexcept { return isModified; };
     inline Coordinates GetLocalCoordinates() const noexcept { return Coordinates(position.x, position.y, position.z); };
     Coordinates GetGlobalCoordinates() const noexcept;
+
+    inline void SetBlock(Coordinates coords, Renderer::Block::BlockType type) { chunk(coords).SetType(type); };
 
     static Coordinates ToGlobal(const Coordinates &coords) noexcept;
     inline bool IsFaceExists(Renderer::Batch::Faces face) const { return existingFaces[static_cast<int>(face)]; };

@@ -27,6 +27,8 @@ void World::Init()
             GenerateChunk(Coordinates(-renderDistance + i, 0.0f, renderDistance - j));
         }
     }
+
+    SetNeighbours();
 }
 
 void World::GenerateChunk(const Coordinates &coords)
@@ -36,14 +38,17 @@ void World::GenerateChunk(const Coordinates &coords)
         return;
 
     auto chunk = new Chunk({coords.x, coords.y, coords.z});
+
     Logger::Log("Gen chunk", Logger::INFO);
     for (int x = 0; x < Chunk::X; x++)
     {
         for (int z = 0; z < Chunk::Z; z++)
         {
-            auto worldPos = Chunk::ToGlobal(coords);
+            auto global = Chunk::ToGlobal(coords);
+            int worldPosX = x + global.x;
+            int worldPosZ = z + global.z;
 
-            auto h = 20 + glm::perlin(glm::vec2((float)worldPos.x / 16.f, (float)worldPos.z / 16.f)) * 10;
+            auto h = 20.0f + glm::perlin(glm::vec2(worldPosX / 16.f, worldPosZ / 16.f)) * 10;
 
             for (int y = 0; y < Chunk::Y; y++)
             {
@@ -53,19 +58,87 @@ void World::GenerateChunk(const Coordinates &coords)
                 {
                     if (y < h - 3)
                     {
-                        auto ch = chunk->GetChunk();
-                        ch(x, y, z).SetType(Renderer::Block::BlockType::COBBLESTONE);
+                        chunk->SetBlock(Coordinates(x, y, z), Renderer::Block::BlockType::COBBLESTONE);
                     }
                     else
                     {
-                        auto ch = chunk->GetChunk();
-                        ch(x, y, z).SetType(Renderer::Block::BlockType::GRASS);
+                        chunk->SetBlock(Coordinates(x, y, z), Renderer::Block::BlockType::GRASS);
                     }
                 }
             }
         }
     }
     chunks[coords] = chunk;
+}
+
+void World::SetNeighbours()
+{
+    // for (int x = 0; x < 3; x++)
+    // {
+    //     for (int y = 0; y < 3; y++)
+    //     {
+    //         for (int z = 0; z < 3; z++)
+    //         {
+
+    //             if (IsInsideActiveChunks(Coordinates(x, y,z+1)))
+    //             {
+    //                 if (chunks[x + chunksSize * y].right == nullptr)
+    //                 {
+    //                     chunks[x + chunksSize * y].right = &chunks[x + chunksSize * (y + 1)];
+    //                     chunks[x + chunksSize * (y + 1)].left = &chunks[x + chunksSize * y];
+    //                 }
+    //             }
+
+    //             if (IsInsideActiveChunks(Coordinates(x, y, z- 1)))
+    //             {
+    //                 if (chunks[x + chunksSize * y].left == nullptr)
+    //                 {
+    //                     chunks[x + chunksSize * y].left = &chunks[x + chunksSize * (y - 1)];
+    //                     chunks[x + chunksSize * (y - 1)].right = &chunks[x + chunksSize * y];
+    //                 }
+    //             }
+
+    //             if (IsInsideActiveChunks(Coordinates(x + 1, y,z)))
+    //             {
+    //                 if (chunks[x + chunksSize * y].up == nullptr)
+    //                 {
+    //                     chunks[x + chunksSize * y].up = &chunks[(x + 1) + chunksSize * y];
+    //                     chunks[(x + 1) + chunksSize * y].down = &chunks[x + chunksSize * y];
+    //                 }
+    //             }
+
+    //             if (IsInsideActiveChunks(Coordinates(x - 1, y,z)))
+    //             {
+    //                 if (chunks[Coordinates(x + activeChunksSize * y)]->down == nullptr)
+    //                 {
+    //                     chunks[{x + activeChunksSize * y}]->down = &chunks[(x - 1) + chunksSize * y];
+    //                     chunks[(x - 1) + chunksSize * y].up = &chunks[x + chunksSize * y];
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+
+    for (auto &i : chunks)
+    {
+        auto coords = i.first;
+        if (chunks.find(Coordinates(coords.x + 1.0f, coords.y, coords.z)) != chunks.end())
+        {
+            i.second->right = *GetChunkByLocal(Coordinates(coords.x + 1.0f, coords.y, coords.z));
+        }
+        if (chunks.find(Coordinates(coords.x - 1.0f, coords.y, coords.z)) != chunks.end())
+        {
+            i.second->left = *GetChunkByLocal(Coordinates(coords.x - 1.0f, coords.y, coords.z));
+        }
+        if (chunks.find(Coordinates(coords.x, coords.y, coords.z - 1.0f)) != chunks.end())
+        {
+            i.second->up = *GetChunkByLocal(Coordinates(coords.x, coords.y, coords.z - 1.0f));
+        }
+        if (chunks.find(Coordinates(coords.x, coords.y, coords.z + 1.0f)) != chunks.end())
+        {
+            i.second->down = *GetChunkByLocal(Coordinates(coords.x, coords.y, coords.z + 1.0f));
+        }
+    }
 }
 
 void World::RemoveChunkFromActive(const Coordinates &coords)
@@ -88,7 +161,11 @@ std::optional<Chunk *> World::GetChunkByLocal(const Coordinates &coords)
 
 std::optional<Chunk *> World::GetChunkByGlobal(const Coordinates &coords)
 {
-    return chunks[Coordinates{static_cast<int>(floorl(coords.x / Chunk::X)), static_cast<int>(floor(coords.y / Chunk::Y)), static_cast<int>(floor(coords.z / Chunk::Z))}];
+    // Logger::Log(std::to_string(static_cast<int>(floorl(coords.x / Chunk::X))), Logger::INFO);
+    // Logger::Log(std::to_string(static_cast<int>(floorl(coords.y / Chunk::Y))), Logger::INFO);
+    // Logger::Log(std::to_string(static_cast<int>(floorl(coords.z / Chunk::Z))), Logger::INFO);
+
+    return chunks[Coordinates{floor(coords.x / Chunk::X), floor(coords.y / Chunk::Y), floor(coords.z / Chunk::Z)}];
 }
 
 bool World::IsChunkInsideActiveChunks(const Coordinates &coords) const

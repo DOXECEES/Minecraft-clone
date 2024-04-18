@@ -20,8 +20,10 @@ public:
 
     void ReloadActiveChunks();
     void GenerateChunk(const Coordinates &coords);
+    void SetNeighbours();
 
-    inline void InsertChunkInsideActive(const Coordinates &coords, Chunk *ch) { chunks[coords] = ch; };
+    inline bool IsInsideActiveChunks(Coordinates coords) { return ((coords.x >= 0 && coords.x < 3) && (coords.y >= 0 && coords.y < 3) && (coords.z >= 0 && coords.z < 3)); };
+    inline void InsertChunkInsideActive(Coordinates coords, Chunk *ch) { chunks[coords] = ch; };
     void RemoveChunkFromActive(const Coordinates &coords);
 
     inline World *GetWorld() const { return worldInstance; };
@@ -45,6 +47,8 @@ private:
 
     Coordinates leftUpActiveChunkPosition;
     Coordinates rightBottomActiveChunkPosition;
+
+    uint8_t activeChunksSize = 3; // TODO
 
     static World *worldInstance;
 };

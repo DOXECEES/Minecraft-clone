@@ -5,36 +5,36 @@
 Chunk::Chunk(const glm::vec3 coords)
     : chunk(X, Y, Z), position(coords)
 {
-    for (int x = 0; x < X; x++)
-    {
-        for (int z = 0; z < Z; z++)
-        {
-            int worldX = x + position.x * X;
-            int worldZ = z + position.z * Z;
+    // for (int x = 0; x < X; x++)
+    // {
+    //     for (int z = 0; z < Z; z++)
+    //     {
+    //         int worldX = x + position.x * X;
+    //         int worldZ = z + position.z * Z;
 
-            auto h = 20 + glm::perlin(glm::vec2((float)worldX / 16.f, (float)worldZ / 16.f)) * 10;
+    //         auto h = 20 + glm::perlin(glm::vec2((float)worldX / 16.f, (float)worldZ / 16.f)) * 10;
 
-            for (int y = 0; y < 10; y++)
-            {
-                int worldY = y + position.y * Y;
+    //         for (int y = 0; y < Chunk::Y; y++)
+    //         {
+    //             int worldY = y + position.y * Y;
 
-                chunk(x, y, z).SetType(Renderer::Block::BlockType::COBBLESTONE);
+    //             // chunk(x, y, z).SetType(Renderer::Block::BlockType::COBBLESTONE);
 
-                // if (y < h)
-                // {
-                //     if (y < h - 3)
-                //     {
-                //         chunk(x, y, z).SetType(Renderer::Block::BlockType::COBBLESTONE);
-                //     }
-                //     else
-                //     {
-                //         chunk(x, y, z).SetType(Renderer::Block::BlockType::GRASS);
-                //     }
-                // }
-                // chunk(x, y, z).SetType(Renderer::Block::BlockType::GRASS);
-            }
-        }
-    }
+    //             if (y < h)
+    //             {
+    //                 if (y < h - 3)
+    //                 {
+    //                     chunk(x, y, z).SetType(Renderer::Block::BlockType::COBBLESTONE);
+    //                 }
+    //                 else
+    //                 {
+    //                     chunk(x, y, z).SetType(Renderer::Block::BlockType::GRASS);
+    //                 }
+    //             }
+    //             chunk(x, y, z).SetType(Renderer::Block::BlockType::GRASS);
+    //         }
+    //     }
+    // }
 }
 
 Coordinates Chunk::ToGlobal(const Coordinates &coords) noexcept

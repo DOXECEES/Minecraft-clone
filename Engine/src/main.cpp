@@ -140,7 +140,6 @@ void DrawLine(glm::vec3 start, glm::vec3 end, Renderer::Shader *sh)
         end.x,
         end.y,
         end.z,
-
     };
 
     glGenVertexArrays(1, &VAO);
@@ -162,10 +161,9 @@ void DrawLine(glm::vec3 start, glm::vec3 end, Renderer::Shader *sh)
     glDrawArrays(GL_LINES, 0, 2);
 }
 
-bool isChunkInsideActiveChunks(int x, int y)
-{
-    return ((x >= 0 && x < 3) && (y >= 0 && y < 3));
-}
+// bool isChunkInsideActiveChunks(int x, int y)
+// {
+// }
 
 int main()
 {
@@ -199,7 +197,7 @@ int main()
     tex.LoadTexture("res\\textures\\block.png");
 
     glEnable(GL_DEPTH_TEST);
-    // glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
 
     auto camera = std::make_unique<Camera>(glm::vec3(0.0f, 0.0f, 0.0f));
 
@@ -230,47 +228,7 @@ int main()
     /// seems its inorrect
     auto world = new World();
 
-    // for (int x = 0; x < chunksSize; x++)
-    // {
-    //     for (int y = 0; y < chunksSize; y++)
-    //     {
-    //         if (isChunkInsideActiveChunks(x, y + 1))
-    //         {
-    //             if (chunks[x + chunksSize * y].right == nullptr)
-    //             {
-    //                 chunks[x + chunksSize * y].right = &chunks[x + chunksSize * (y + 1)];
-    //                 chunks[x + chunksSize * (y + 1)].left = &chunks[x + chunksSize * y];
-    //             }
-    //         }
-
-    //         if (isChunkInsideActiveChunks(x, y - 1))
-    //         {
-    //             if (chunks[x + chunksSize * y].left == nullptr)
-    //             {
-    //                 chunks[x + chunksSize * y].left = &chunks[x + chunksSize * (y - 1)];
-    //                 chunks[x + chunksSize * (y - 1)].right = &chunks[x + chunksSize * y];
-    //             }
-    //         }
-
-    //         if (isChunkInsideActiveChunks(x + 1, y))
-    //         {
-    //             if (chunks[x + chunksSize * y].up == nullptr)
-    //             {
-    //                 chunks[x + chunksSize * y].up = &chunks[(x + 1) + chunksSize * y];
-    //                 chunks[(x + 1) + chunksSize * y].down = &chunks[x + chunksSize * y];
-    //             }
-    //         }
-
-    //         if (isChunkInsideActiveChunks(x - 1, y))
-    //         {
-    //             if (chunks[x + chunksSize * y].down == nullptr)
-    //             {
-    //                 chunks[x + chunksSize * y].down = &chunks[(x - 1) + chunksSize * y];
-    //                 chunks[(x - 1) + chunksSize * y].up = &chunks[x + chunksSize * y];
-    //             }
-    //         }
-    //     }
-    // }
+    //
 
     bool isInfoMenuEnabled = false;
     auto batch = Renderer::Batch(&tex);
@@ -298,8 +256,10 @@ int main()
         curDirection = cameraPos;
 
         {
-            frontChunk = *world->GetChunkByGlobal({static_cast<int>(cameraPos.x), static_cast<int>(cameraPos.y), static_cast<int>(cameraPos.z)});
-            // Logger::Log("Front", Logger::INFO);
+            frontChunk = *world->GetChunkByGlobal({cameraPos.x, cameraPos.y, cameraPos.z});
+            // Logger::Log(std::to_string(static_cast<int>(cameraPos.x)), Logger::INFO);
+            // Logger::Log(std::to_string(static_cast<int>(cameraPos.y)), Logger::INFO);
+            // Logger::Log(std::to_string(static_cast<int>(cameraPos.z)), Logger::INFO);
         }
 
         // get movement direction

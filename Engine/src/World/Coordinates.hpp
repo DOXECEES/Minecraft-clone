@@ -4,9 +4,9 @@
 
 struct Coordinates
 {
-    int x;
-    int y;
-    int z;
+    float x;
+    float y;
+    float z;
 
     // bool operator==(const Coordinates &rhs) const
     // {
