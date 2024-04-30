@@ -161,10 +161,6 @@ void DrawLine(glm::vec3 start, glm::vec3 end, Renderer::Shader *sh)
     glDrawArrays(GL_LINES, 0, 2);
 }
 
-// bool isChunkInsideActiveChunks(int x, int y)
-// {
-// }
-
 int main()
 {
     setlocale(LC_ALL, "ru");
@@ -201,31 +197,10 @@ int main()
 
     auto camera = std::make_unique<Camera>(glm::vec3(0.0f, 0.0f, 0.0f));
 
-    // Array3D<Renderer::Block> chunk(96, 256, 96);
     const size_t X = 16;
     const size_t Y = 256;
     const size_t Z = 16;
 
-    // std::vector<Chunk> chunks;
-
-    // int renderDistance = 1;
-    // int chunksSize = renderDistance * 2 + 1;
-    // // Array3D<Chunk> chunks(chunksSize, 1 , chunksSize);
-
-    // // 0 3 6
-    // // 1 4 7
-    // // 2 5 8
-
-    // for (int i = 0; i < chunksSize; i++)
-    // {
-    //     for (int j = 0; j < chunksSize; j++)
-    //     {
-    //         chunks.emplace_back(Chunk({-renderDistance + i, 0.0f, renderDistance - j}));
-    //     }
-    // }
-
-    // set neighbour chunks
-    /// seems its inorrect
     auto world = new World();
 
     //
@@ -237,6 +212,13 @@ int main()
     glm::vec3 curDirection = cameraPos;
     glm::vec3 prevDirection = curDirection;
     Chunk *frontChunk = nullptr;
+
+    auto a = world->GetChunkByLocal(Coordinates(1, 0, 1));
+
+    auto saveCam = cameraPos;
+    auto saveDir = dir;
+    glm::vec3 dirVec = {};
+    auto saveDirVec = dirVec;
 
     while (wnd->Render())
     {
@@ -253,8 +235,49 @@ int main()
         glm::vec3 cameraFront = camera->GetFront();
 
         auto dir = camera->GetDirection();
-        curDirection = cameraPos;
 
+        auto blockCoords = Coordinates();
+
+        /// TODO RAY CAST OBJECTS
+
+        for (int i = 0; i < 1; i++)
+        {
+            auto t = std::to_string(cameraPos.x / 16.0f) + " " + std::to_string(cameraPos.y / 256.0f) + " " + std::to_string(cameraPos.z / 16.0f);
+
+            if (world->GetBlockByGlobal(Coordinates(cameraPos.x + (dirVec.x * 5), cameraPos.y + (dirVec.y * 5), cameraPos.z + (dirVec.z * 5))) != Renderer::Block::BlockType::AIR)
+            {
+                blockCoords = Coordinates(cameraPos.x + (dirVec.x * 5), cameraPos.y + (dirVec.y * 5), cameraPos.z + (dirVec.z * 5));
+                t += " BLOCK";
+                glfwSetWindowTitle(wnd->GetWindow(), t.c_str());
+            }
+            else
+            {
+                t += " NOBLOC";
+                glfwSetWindowTitle(wnd->GetWindow(), t.c_str());
+            }
+
+            // if (auto chunk = world->GetChunkByGlobal(Coordinates(cameraPos.x + dir.x + i, cameraPos.y + dir.y + i, cameraPos.z + dir.z + i)))
+            // {
+            //     if (chunk.has_value())
+            //     {
+            //         Logger::Log(t, Logger::INFO);
+            //         if (chunk.value()->GetChunk()(abs((cameraPos.x / 16.0f + dir.x + i)), abs(cameraPos.y / 256.0f + dir.y), abs(cameraPos.z / 16.0f + dir.z + i)).GetTypeUInt() != 0)
+            //         {
+            //             chunk.value()->DeleteBlock(Coordinates(abs((cameraPos.x / 16.0f + dir.x + i)), abs(cameraPos.y / 256.0f + dir.y), abs(cameraPos.z / 16.0f + dir.z + i)));
+            //             t += " BLOCK";
+            //             glfwSetWindowTitle(wnd->GetWindow(), t.c_str());
+            //             break;
+            //         }
+            //         else
+            //         {
+            //             t += " NOBLOC";
+            //             glfwSetWindowTitle(wnd->GetWindow(), t.c_str());
+            //         }
+            //     }
+            // }
+        }
+
+        curDirection = cameraPos;
         {
             frontChunk = *world->GetChunkByGlobal({cameraPos.x, cameraPos.y, cameraPos.z});
             // Logger::Log(std::to_string(static_cast<int>(cameraPos.x)), Logger::INFO);
@@ -291,6 +314,8 @@ int main()
         auto chunkX = cameraPos.x / 16;
         auto chunkY = cameraPos.y / 256;
         auto chunkZ = cameraPos.z / 16;
+
+        bool drawDir = false;
 
         if (wnd->IsKeyPressed(GLFW_KEY_A))
         {
@@ -335,16 +360,34 @@ int main()
         {
             isInfoMenuEnabled = !isInfoMenuEnabled;
         }
+        if (wnd->IsKeyPressed(GLFW_KEY_F4))
+        {
+            drawDir = !drawDir;
+        }
+        if (wnd->IsKeyPressed(GLFW_KEY_Q))
+        {
+            world->DeleteBlockByGlobal(blockCoords);
+        }
+
+        if (drawDir)
+        {
+            saveCam = cameraPos;
+            saveDir = dir;
+            saveDirVec = dirVec;
+        }
+        DrawLine(saveCam, saveCam + glm::vec3{saveDirVec.x * 5, saveDirVec.y * 5, saveDirVec.z * 5}, &s);
 
         camera->Update(cameraPos, wnd->input->mouse->GetX(), wnd->input->mouse->GetY());
-        std::string title;
-        if (frontChunk != nullptr)
-            title = std::to_string(frontChunk->GetLocalCoordinates().x) + " " + std::to_string(frontChunk->GetLocalCoordinates().y) + " " + std::to_string(frontChunk->GetLocalCoordinates().z);
-        // auto title = "";
-        title += "\t" + std::to_string(cameraPos.x) + " " + std::to_string(cameraPos.y) + " " + std::to_string(cameraPos.z);
+        // std::string title;
+        //  if (frontChunk != nullptr)
+        //      title = std::to_string(frontChunk->GetLocalCoordinates().x) + " " + std::to_string(frontChunk->GetLocalCoordinates().y) + " " + std::to_string(frontChunk->GetLocalCoordinates().z);
+        //  // auto title = "";
+        //  title += "\t" + std::to_string(cameraPos.x) + " " + std::to_string(cameraPos.y) + " " + std::to_string(cameraPos.z);
 
         auto camX = ceil(cameraPos.x / 16);
         auto camZ = ceil(cameraPos.z / 16);
+
+        dirVec = dir - cameraPos;
 
         // auto chunk = &chunks[camX + chunksSize * camZ];
 
@@ -360,7 +403,7 @@ int main()
         // auto down = chunk->down->GetPosition();
 
         // auto title = "LEFT: " + std::to_string(left.x) + " " + std::to_string(left.y) + " " + std::to_string(left.z) + " CUR: " + std::to_string(camX) + " " + std::to_string(0) + " " + std::to_string(camZ);
-        glfwSetWindowTitle(wnd->GetWindow(), title.c_str());
+        // glfwSetWindowTitle(wnd->GetWindow(), title.c_str());
         //
 
         // Projection
@@ -399,31 +442,9 @@ int main()
                 DrawLine(glm::vec3{coords.x + 15.5f, 0.0f, coords.z + 15.5f}, glm::vec3{coords.x + 15.5f, 256.0f, coords.z + 15.5f}, &s);
             }
         }
-        for (auto &i : chunk)
+        for (auto &[coords, chunk] : chunk)
         {
-            renderer.render(&batch, i.second, &s);
-        }
-
-        if (isInfoMenuEnabled)
-        {
-            std::string str = "dsa";
-            // Set up the 2D rendering matrix
-            glMatrixMode(GL_PROJECTION);
-            glLoadIdentity();
-            glOrtho(0, 1920, 0, 1080, -1, 1);
-            glMatrixMode(GL_MODELVIEW);
-            glLoadIdentity();
-
-            // Set up the font and color
-            glColor3f(1, 1, 1);
-            glRasterPos2f(100, 100);
-            for (int i = 0; i < str.size(); i++)
-            {
-                glBegin(GL_LINE);
-                glVertex2d(0.0f, 0.0f);
-                glVertex2d(0.0f, 1.0f);
-                glEnd();
-            }
+            renderer.render(&batch, chunk, &s);
         }
     }
     glfwTerminate();

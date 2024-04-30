@@ -8,6 +8,21 @@ struct Coordinates
     float y;
     float z;
 
+    const Coordinates operator*(int k) const
+    {
+        return Coordinates(this->x * k, this->y * k, this->z * k);
+    }
+
+    const Coordinates operator*(const Coordinates &other) const
+    {
+        return Coordinates(this->x * other.x, this->y * other.y, this->z * other.z);
+    }
+
+    const Coordinates operator-(const Coordinates &other) const
+    {
+        return Coordinates(this->x - other.x, this->y - other.y, this->z - other.z);
+    }
+
     // bool operator==(const Coordinates &rhs) const
     // {
     //     return ((this->x == rhs.x) && (this->y == rhs.y) && (this->z == rhs.z));

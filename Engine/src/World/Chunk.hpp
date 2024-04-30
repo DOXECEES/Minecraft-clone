@@ -24,11 +24,23 @@ public:
     Coordinates GetGlobalCoordinates() const noexcept;
 
     inline void SetBlock(Coordinates coords, Renderer::Block::BlockType type) { chunk(coords).SetType(type); };
+    inline void DeleteBlock(Coordinates coords)
+    {
+        chunk(coords).SetType(Renderer::Block::BlockType::AIR);
+        isModified = true;
+    };
 
-    static Coordinates ToGlobal(const Coordinates &coords) noexcept;
     inline bool IsFaceExists(Renderer::Batch::Faces face) const { return existingFaces[static_cast<int>(face)]; };
     inline void SetFace(Renderer::Batch::Faces face) { existingFaces.set(static_cast<int>(face)); };
 
+    static Coordinates ToGlobal(const Coordinates &coords) noexcept;
+
+    /// @brief
+    /// @param coords
+    /// @return first param represents coordinate of chunk in world coords;
+    /// @return second represents coordinate of block in this coords
+
+    static std::pair<Coordinates, Coordinates> ToLocal(const Coordinates &coords) noexcept;
     static bool IsBlockInsideChunk(const Coordinates &coords) noexcept;
 
 private:

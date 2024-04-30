@@ -16,6 +16,10 @@ public:
     std::optional<Chunk *> GetChunkByLocal(const Coordinates &coords);
     std::optional<Chunk *> GetChunkByGlobal(const Coordinates &coords);
 
+    Renderer::Block::BlockType GetBlockByGlobal(Coordinates coords);
+
+    void DeleteBlockByGlobal(Coordinates coords);
+
     Coordinates GetChunkCoordinates() const;
 
     void ReloadActiveChunks();

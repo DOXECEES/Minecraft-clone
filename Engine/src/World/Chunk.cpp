@@ -42,6 +42,16 @@ Coordinates Chunk::ToGlobal(const Coordinates &coords) noexcept
     return Coordinates(coords.x * Chunk::X, coords.y * Chunk::Y, coords.z * Chunk::Z);
 }
 
+std::pair<Coordinates, Coordinates> Chunk::ToLocal(const Coordinates &coords) noexcept
+{
+    auto chunkCoords = Coordinates(floorf(coords.x / Chunk::X), floorf(coords.y / Chunk::Y), floorf(coords.z / Chunk::Z));
+
+    auto borders = chunkCoords * Coordinates(Chunk::X, Chunk::Y, Chunk::Z);
+    auto result = coords - borders;
+
+    return {chunkCoords, {floorf(result.x), floorf(result.y), floorf(result.z)}};
+}
+
 void Chunk::SetModified(bool exp) noexcept
 {
     isModified = exp;

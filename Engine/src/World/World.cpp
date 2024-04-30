@@ -161,16 +161,43 @@ std::optional<Chunk *> World::GetChunkByLocal(const Coordinates &coords)
 
 std::optional<Chunk *> World::GetChunkByGlobal(const Coordinates &coords)
 {
-    // Logger::Log(std::to_string(static_cast<int>(floorl(coords.x / Chunk::X))), Logger::INFO);
-    // Logger::Log(std::to_string(static_cast<int>(floorl(coords.y / Chunk::Y))), Logger::INFO);
-    // Logger::Log(std::to_string(static_cast<int>(floorl(coords.z / Chunk::Z))), Logger::INFO);
+    if (chunks.find(Coordinates{floor(coords.x / Chunk::X), floor(coords.y / Chunk::Y), floor(coords.z / Chunk::Z)}) != chunks.end())
+    {
+        return chunks[Coordinates{floor(coords.x / Chunk::X), floor(coords.y / Chunk::Y), floor(coords.z / Chunk::Z)}];
+    }
+    // return chunks[Coordinates{floor(coords.x / Chunk::X), floor(coords.y / Chunk::Y), floor(coords.z / Chunk::Z)}];
 
-    return chunks[Coordinates{floor(coords.x / Chunk::X), floor(coords.y / Chunk::Y), floor(coords.z / Chunk::Z)}];
+    return {};
+}
+
+Renderer::Block::BlockType World::GetBlockByGlobal(Coordinates coords)
+{
+    auto local = Chunk::ToLocal(coords);
+
+    auto chunk = GetChunkByGlobal(coords);
+
+    if (chunk.has_value())
+    {
+        auto a = (chunk.value()->GetChunk()({local.second.x, local.second.y, local.second.z})).GetType();
+
+        return a;
+    }
+    return Renderer::Block::BlockType::AIR;
 }
 
 bool World::IsChunkInsideActiveChunks(const Coordinates &coords) const
 {
     return ((coords.x >= leftUpActiveChunkPosition.x && coords.x < rightBottomActiveChunkPosition.x) && (coords.y >= leftUpActiveChunkPosition.y && coords.y < rightBottomActiveChunkPosition.y) && (coords.z >= leftUpActiveChunkPosition.z && coords.z < rightBottomActiveChunkPosition.z));
+}
+
+void World::DeleteBlockByGlobal(Coordinates coords)
+{
+    auto local = Chunk::ToLocal(coords);
+    auto chunk = GetChunkByLocal(local.first);
+    if (chunk.has_value())
+    {
+        chunk.value()->DeleteBlock(local.second);
+    }
 }
 
 World *World::worldInstance = nullptr;
