@@ -174,7 +174,7 @@ int main()
 
     Logger::Log("Starting...", Logger::INFO);
 
-    glfwSetErrorCallback(error_callback);
+    // glfwSetErrorCallback(error_callback);
 
     Renderer::Window *wnd = new Renderer::Window(1920, 1080, "ass");
 
@@ -219,6 +219,7 @@ int main()
     auto saveDir = dir;
     glm::vec3 dirVec = {};
     auto saveDirVec = dirVec;
+    auto clik = false;
 
     while (wnd->Render())
     {
@@ -363,6 +364,11 @@ int main()
         if (wnd->IsKeyPressed(GLFW_KEY_F4))
         {
             drawDir = !drawDir;
+            if (!clik)
+            {
+                world->DeleteBlockByGlobal(Coordinates(16.0f, 4.0f, -16.0f));
+                clik = true;
+            }
         }
         if (wnd->IsKeyPressed(GLFW_KEY_Q))
         {
@@ -442,9 +448,13 @@ int main()
                 DrawLine(glm::vec3{coords.x + 15.5f, 0.0f, coords.z + 15.5f}, glm::vec3{coords.x + 15.5f, 256.0f, coords.z + 15.5f}, &s);
             }
         }
+        int i = 0;
+        int j = 4;
         for (auto &[coords, chunk] : chunk)
         {
-            renderer.render(&batch, chunk, &s);
+            auto batch = Renderer::Batch(&tex);
+            renderer.render(&batch, chunk, &s, i);
+            i++;
         }
     }
     glfwTerminate();

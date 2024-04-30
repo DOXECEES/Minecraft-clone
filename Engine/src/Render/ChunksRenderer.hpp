@@ -8,8 +8,10 @@ namespace Renderer
     class ChunksRenderer
     {
     public:
-        ChunksRenderer() = default;
-        void render(Renderer::Batch *batch, Chunk *ch, Renderer::Shader *shader);
+        ChunksRenderer() : mesh(9, nullptr){
+
+                           };
+        void render(Renderer::Batch *batch, Chunk *ch, Renderer::Shader *shader, int index);
 
     private:
         bool RenderEdge(Chunk *chunk, Chunk *neighbour, const Coordinates &coords, Renderer::Batch::Faces face);
@@ -17,6 +19,6 @@ namespace Renderer
         bool IsFaceVisible(const Chunk *ch, const Coordinates &coords);
 
     private:
-        Mesh *mesh = nullptr;
+        std::vector<Mesh *> mesh;
     };
 };

@@ -2,13 +2,13 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "ChunksRenderer.hpp"
 
-void Renderer::ChunksRenderer::render(Renderer::Batch *batch, Chunk *ch, Renderer::Shader *shader)
+void Renderer::ChunksRenderer::render(Renderer::Batch *batch, Chunk *ch, Renderer::Shader *shader, int index)
 {
     auto chunk = ch->GetChunk();
 
     if (!ch->Modified())
     {
-        mesh->Draw(*shader);
+        mesh[index]->Draw(*shader);
         return;
     }
 
@@ -55,9 +55,9 @@ void Renderer::ChunksRenderer::render(Renderer::Batch *batch, Chunk *ch, Rendere
         }
     }
 
-    delete mesh;
-    mesh = batch->GetMesh();
-    mesh->Draw(*shader);
+    delete mesh[index];
+    mesh[index] = batch->GetMesh();
+    mesh[index]->Draw(*shader);
 
     ch->SetModified(false);
 }

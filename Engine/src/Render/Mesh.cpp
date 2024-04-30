@@ -5,11 +5,11 @@
 
 Renderer::Mesh::Mesh(std::vector<GLfloat> &vertices, std::vector<unsigned int> &indices)
 {
-    this->vertices = vertices;
-    this->indices = indices;
+    this->vertices = std::vector(vertices);
+    this->indices = std::vector(indices);
 
     vao = new Renderer::VertexArray();
-    vao->Link(vertices, indices);
+    vao->Link(this->vertices, this->indices);
 }
 
 void Renderer::Mesh::Draw(Shader &shader)
