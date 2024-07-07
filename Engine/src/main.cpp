@@ -161,6 +161,152 @@ void DrawLine(glm::vec3 start, glm::vec3 end, Renderer::Shader *sh)
     glDrawArrays(GL_LINES, 0, 2);
 }
 
+void DrawCube(Coordinates coords, Renderer::Shader *sh)
+{
+    GLuint VAO;
+    GLuint VBO;
+
+    std::cout << coords.x << " " << coords.y << " " << coords.z << std::endl;
+
+    std::vector<float> vertices = {
+        coords.x - 0.5f,
+        coords.y + 0.5f,
+        coords.z + 0.5f,
+
+        coords.x - 0.5f,
+        coords.y - 0.5f,
+        coords.z + 0.5f,
+
+        coords.x + 0.5f,
+        coords.y - 0.5f,
+        coords.z + 0.5f,
+
+        // coords.x + 0.5f,
+        // coords.y - 0.5f,
+        // coords.z + 0.5f,
+    };
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    sh->Use();
+
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+}
+
+auto blockCoords = Coordinates();
+
+void rayCast(Coordinates begin, Coordinates end, World *w)
+{
+
+    glm::vec3 iend;
+
+    float px = begin.x;
+    float py = begin.y;
+    float pz = begin.z;
+
+    float dx = end.x - begin.x;
+    float dy = end.y - begin.y;
+    float dz = end.z - begin.z;
+
+    float t = 0.0f;
+    int ix = floor(px);
+    int iy = floor(py);
+    int iz = floor(pz);
+
+    float stepx = (dx > 0.0f) ? 1.0f : -1.0f;
+    float stepy = (dy > 0.0f) ? 1.0f : -1.0f;
+    float stepz = (dz > 0.0f) ? 1.0f : -1.0f;
+
+    float infinity = std::numeric_limits<float>::infinity();
+
+    float txDelta = (dx == 0.0f) ? infinity : abs(1.0f / dx);
+    float tyDelta = (dy == 0.0f) ? infinity : abs(1.0f / dy);
+    float tzDelta = (dz == 0.0f) ? infinity : abs(1.0f / dz);
+
+    float xdist = (stepx > 0) ? (ix + 1 - px) : (px - ix);
+    float ydist = (stepy > 0) ? (iy + 1 - py) : (py - iy);
+    float zdist = (stepz > 0) ? (iz + 1 - pz) : (pz - iz);
+
+    float txMax = (txDelta < infinity) ? txDelta * xdist : infinity;
+    float tyMax = (tyDelta < infinity) ? tyDelta * ydist : infinity;
+    float tzMax = (tzDelta < infinity) ? tzDelta * zdist : infinity;
+
+    int steppedIndex = -1;
+
+    while (t <= 5)
+    {
+
+        if (auto block = w->GetBlockByGlobal({(float)ix, (float)iy, (float)iz}) != Renderer::Block::BlockType::AIR)
+        {
+            end.x = px + t * dx;
+            end.y = py + t * dy;
+            end.z = pz + t * dz;
+
+            iend.x = ix;
+            iend.y = iy;
+            iend.z = iz;
+
+            blockCoords = {(float)ix, (float)iy, (float)iz};
+            return;
+        }
+        if (txMax < tyMax)
+        {
+            if (txMax < tzMax)
+            {
+                ix += stepx;
+                t = txMax;
+                txMax += txDelta;
+                steppedIndex = 0;
+            }
+            else
+            {
+                iz += stepz;
+                t = tzMax;
+                tzMax += tzDelta;
+                steppedIndex = 2;
+            }
+        }
+        else
+        {
+            if (tyMax < tzMax)
+            {
+                iy += stepy;
+                t = tyMax;
+                tyMax += tyDelta;
+                steppedIndex = 1;
+            }
+            else
+            {
+                iz += stepz;
+                t = tzMax;
+                tzMax += tzDelta;
+                steppedIndex = 2;
+            }
+        }
+    }
+    iend.x = ix;
+    iend.y = iy;
+    iend.z = iz;
+
+    end.x = px + t * dx;
+    end.y = py + t * dy;
+    end.z = pz + t * dz;
+}
+
+std::chrono::steady_clock::time_point sc;
+
 int main()
 {
     setlocale(LC_ALL, "ru");
@@ -178,7 +324,7 @@ int main()
 
     Renderer::Window *wnd = new Renderer::Window(1920, 1080, "ass");
 
-    glViewport(0, 0, 1920, 1080);
+    // glViewport(0, 0, 1920, 1080);
 
     Renderer::Shader s = Renderer::Shader();
     s.LoadShader("res\\Shaders\\ver.vs");
@@ -223,6 +369,7 @@ int main()
 
     while (wnd->Render())
     {
+
         // Render
         // Clear the colorbuffer
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -237,46 +384,51 @@ int main()
 
         auto dir = camera->GetDirection();
 
-        auto blockCoords = Coordinates();
-
+        dirVec = dir - cameraPos;
         /// TODO RAY CAST OBJECTS
+        // for (float i = 0; i < 5; i += 0.1f)
+        // {
+        //     auto t = std::to_string(cameraPos.x / 16.0f) + " " + std::to_string(cameraPos.y / 256.0f) + " " + std::to_string(cameraPos.z / 16.0f);
 
-        for (int i = 0; i < 1; i++)
-        {
-            auto t = std::to_string(cameraPos.x / 16.0f) + " " + std::to_string(cameraPos.y / 256.0f) + " " + std::to_string(cameraPos.z / 16.0f);
+        //     if (world->GetBlockByGlobal(Coordinates(cameraPos.x + (dirVec.x * i), cameraPos.y + (dirVec.y * i), cameraPos.z + (dirVec.z * i))) != Renderer::Block::BlockType::AIR)
+        //     {
+        //         blockCoords = Coordinates(cameraPos.x + (dirVec.x * i), cameraPos.y + (dirVec.y * i), cameraPos.z + (dirVec.z * i));
+        //         t += " BLOCK";
+        //         glfwSetWindowTitle(wnd->GetWindow(), t.c_str());
+        //         break;
+        //     }
+        //     else
+        //     {
+        //         t += " NOBLOC";
+        //         glfwSetWindowTitle(wnd->GetWindow(), t.c_str());
+        //     }
 
-            if (world->GetBlockByGlobal(Coordinates(cameraPos.x + (dirVec.x * 5), cameraPos.y + (dirVec.y * 5), cameraPos.z + (dirVec.z * 5))) != Renderer::Block::BlockType::AIR)
-            {
-                blockCoords = Coordinates(cameraPos.x + (dirVec.x * 5), cameraPos.y + (dirVec.y * 5), cameraPos.z + (dirVec.z * 5));
-                t += " BLOCK";
-                glfwSetWindowTitle(wnd->GetWindow(), t.c_str());
-            }
-            else
-            {
-                t += " NOBLOC";
-                glfwSetWindowTitle(wnd->GetWindow(), t.c_str());
-            }
+        //     // if (auto chunk = world->GetChunkByGlobal(Coordinates(cameraPos.x + dir.x + i, cameraPos.y + dir.y + i, cameraPos.z + dir.z + i)))
+        //     // {
+        //     //     if (chunk.has_value())
+        //     //     {
+        //     //         Logger::Log(t, Logger::INFO);
+        //     //         if (chunk.value()->GetChunk()(abs((cameraPos.x / 16.0f + dir.x + i)), abs(cameraPos.y / 256.0f + dir.y), abs(cameraPos.z / 16.0f + dir.z + i)).GetTypeUInt() != 0)
+        //     //         {
+        //     //             chunk.value()->DeleteBlock(Coordinates(abs((cameraPos.x / 16.0f + dir.x + i)), abs(cameraPos.y / 256.0f + dir.y), abs(cameraPos.z / 16.0f + dir.z + i)));
+        //     //             t += " BLOCK";
+        //     //             glfwSetWindowTitle(wnd->GetWindow(), t.c_str());
+        //     //             break;
+        //     //         }
+        //     //         else
+        //     //         {
+        //     //             t += " NOBLOC";
+        //     //             glfwSetWindowTitle(wnd->GetWindow(), t.c_str());
+        //     //         }
+        //     //     }
+        //     // }
+        // }
 
-            // if (auto chunk = world->GetChunkByGlobal(Coordinates(cameraPos.x + dir.x + i, cameraPos.y + dir.y + i, cameraPos.z + dir.z + i)))
-            // {
-            //     if (chunk.has_value())
-            //     {
-            //         Logger::Log(t, Logger::INFO);
-            //         if (chunk.value()->GetChunk()(abs((cameraPos.x / 16.0f + dir.x + i)), abs(cameraPos.y / 256.0f + dir.y), abs(cameraPos.z / 16.0f + dir.z + i)).GetTypeUInt() != 0)
-            //         {
-            //             chunk.value()->DeleteBlock(Coordinates(abs((cameraPos.x / 16.0f + dir.x + i)), abs(cameraPos.y / 256.0f + dir.y), abs(cameraPos.z / 16.0f + dir.z + i)));
-            //             t += " BLOCK";
-            //             glfwSetWindowTitle(wnd->GetWindow(), t.c_str());
-            //             break;
-            //         }
-            //         else
-            //         {
-            //             t += " NOBLOC";
-            //             glfwSetWindowTitle(wnd->GetWindow(), t.c_str());
-            //         }
-            //     }
-            // }
-        }
+        rayCast(Coordinates(cameraPos.x, cameraPos.y, cameraPos.z),
+                Coordinates(cameraPos.x + (dirVec.x * 2), cameraPos.y + (dirVec.y * 2), cameraPos.z + (dirVec.z * 2)),
+                world);
+
+        DrawCube(blockCoords, &s);
 
         curDirection = cameraPos;
         {
@@ -367,14 +519,15 @@ int main()
             if (!clik)
             {
                 world->DeleteBlockByGlobal(Coordinates(16.0f, 4.0f, -16.0f));
+                // world->GetChunkByLocal({0,0,0}).value()->DeleteBlock()
                 clik = true;
             }
         }
         if (wnd->IsKeyPressed(GLFW_KEY_Q))
         {
+            sc = std::chrono::steady_clock::now();
             world->DeleteBlockByGlobal(blockCoords);
         }
-
         if (drawDir)
         {
             saveCam = cameraPos;
@@ -392,8 +545,6 @@ int main()
 
         auto camX = ceil(cameraPos.x / 16);
         auto camZ = ceil(cameraPos.z / 16);
-
-        dirVec = dir - cameraPos;
 
         // auto chunk = &chunks[camX + chunksSize * camZ];
 
@@ -438,6 +589,8 @@ int main()
 
         if (isInfoMenuEnabled)
         {
+            DrawLine(glm::vec3{blockCoords.x, blockCoords.y, blockCoords.z}, glm::vec3{blockCoords.x, blockCoords.y + 256, blockCoords.z}, &s);
+
             // coordinates are not integers because the coordinate points to the center of the block
             for (auto &i : chunk)
             {
@@ -457,5 +610,6 @@ int main()
             i++;
         }
     }
+
     glfwTerminate();
 }

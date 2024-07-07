@@ -68,7 +68,7 @@ void Renderer::Shader::CompileShader(GLuint &shader)
     {
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &param);
 
-        std::unique_ptr<char[]> log(new char[param]);
+        auto log = std::make_unique<char[]>(param);
 
         glGetShaderInfoLog(shader, param, &param, log.get());
         Logger::Log(log.get(), Logger::ERROR);

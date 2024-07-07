@@ -21,11 +21,11 @@ void Renderer::VertexArray::UnBind()
 void Renderer::VertexArray::Link(const std::vector<GLfloat> &data, const std::vector<GLuint> &indices)
 {
     Bind();
-    std::unique_ptr<VertexBuffer> VBO(new VertexBuffer());
+    auto VBO = std::make_unique<VertexBuffer>();
     VBO->Bind();
     VBO->SetData(data);
 
-    std::unique_ptr<IndexBuffer> EBO(new IndexBuffer());
+    auto EBO = std::make_unique<IndexBuffer>();
     EBO->Bind();
     EBO->SetElements(indices);
 
